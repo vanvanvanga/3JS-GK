@@ -156,7 +156,7 @@ loader.load(
 // 4. Camera position setup ----------------------------------------------------------------------
 camera.position.set(50, 1, -55);
 
-// 5. Animate function ---------------------------------------------------------------------------
+// 5. Animate ---------------------------------------------------------------------------
 function animate() {
   console.log(camera.position); // in vị trí của camera trong console
   controls.update();
