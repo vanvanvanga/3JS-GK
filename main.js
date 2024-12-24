@@ -142,115 +142,159 @@ scene.add(cube);
 cube.position.set(-80, 0, 200);
 cube.scale.set(50, 100, 100);
 
-// 5. TV:---------------------------------------------------------------------------
-new GLTFLoader().load("model/GK-tv.glb", function (tv) {
-  scene.add(tv.scene);
-  tv.scene.position.set(-80, 50, 200);
-  tv.scene.rotation.set(0, -3.14, 0);
-  tv.scene.scale.set(260, 220, 260);
+// 5. Rèm cửa + Op2
+// 5.1. Rèm cửa
+const curtainTexture = new THREE.TextureLoader().load('curtain.png');
+const txtRem = new THREE.MeshStandardMaterial({ map: curtainTexture });
+const curtainGeometry = new THREE.BoxGeometry(0.01, 20, 12);
+const curtainLeft = new THREE.Mesh(curtainGeometry, txtRem); 
+const curtainRight = curtainLeft.clone(); 
+scene.add ( curtainRight );
+scene.add ( curtainLeft );
+ 
+// 5.2. Thanh treo rèm
+const geometry = new THREE.CylinderGeometry( 0.5, 0.5, 30, 100 ); 
+const material = new THREE.MeshBasicMaterial( {color: 0xffffff} ); 
+const cylinder = new THREE.Mesh( geometry, material ); 
+cylinder.rotation.x = Math.PI / 2;
+scene.add( cylinder );
 
-  tv.scene.traverse(function (child) {
-    if (child.isMesh && child.name === "TV1_Screen_0") {
-      tvScreenMesh = child;
-      tvScreenMesh.material = new THREE.MeshBasicMaterial({
-        map: blackTexture,
-      });
+// 5.3 Resize lại rèm cửa
+curtainLeft.scale.set (15, 15, 16);
+curtainRight.scale.set (15, 15, 16);
+cylinder.scale.set (13, 13, 13);
+
+// 5.4. Đặt vị trí rèm cửa
+cylinder.position.set (310, 230, -30);
+curtainLeft.position.set (310, 75, -125);
+curtainRight.position.set (310, 75, 65);
+
+// 5.5. Đóng mở rèm cửa
+let isCurtainOpen = true; 
+function toggleCurtain() {
+    if (isCurtainOpen) {
+        gsap.to(curtainLeft.scale, { z: 5, duration: 1 });
+        gsap.to(curtainLeft.position, { z: -190, duration: 1 }); 
+        gsap.to(curtainRight.scale, { z: 5, duration: 1 });
+        gsap.to(curtainRight.position, { z: 130, duration: 1 }); 
+    } else {
+        gsap.to(curtainLeft.scale, { z: 16, duration: 1 });
+        gsap.to(curtainLeft.position, { z: -125, duration: 1 }); 
+        gsap.to(curtainRight.scale, { z: 16, duration: 1 });
+        gsap.to(curtainRight.position, { z: 65, duration: 1 }); 
     }
-  });
-});
+    isCurtainOpen = !isCurtainOpen;
+}
+document.getElementById('toggle-curtain').addEventListener('click', toggleCurtain);
 
-// 5.1. Video và Texture---------------------------------------------------------------------------
-const video = document.getElementById("tv-video");
+// 6. TV + Opption 1:---------------------------------------------------------------------------
+new GLTFLoader().load('GK-tv.glb',
+    function (tv) {
+        scene.add(tv.scene);
+        tv.scene.position.set(-80, 50, 200);
+        tv.scene.rotation.set(0, -3.14, 0);
+        tv.scene.scale.set(260, 220, 260);
+
+        tv.scene.traverse(function (child) {
+            if (child.isMesh && child.name === 'TV1_Screen_0') {
+                tvScreenMesh = child;
+                tvScreenMesh.material = new THREE.MeshBasicMaterial({ map: blackTexture });
+            }
+        });
+    }
+);
+
+
+// 6.1. Video và Texture---------------------------------------------------------------------------
+const video = document.getElementById('tv-video');
 video.muted = false;
 video.volume = 1.0;
 video.pause();
 video.currentTime = 0; // Đặt lại thời gian phát về đầu
 const videoTexture = new THREE.VideoTexture(video);
-const blackTexture = new THREE.TextureLoader().load("textures/black.png");
+const blackTexture = new THREE.TextureLoader().load('black.png');
 let tvScreenMesh = null;
 let isTvOn = false;
 
-// 5.2. Đổi kênh---------------------------------------------------------------------------
+// 6.2. Đổi kênh---------------------------------------------------------------------------
 const channels = [
-  "./videos/channel1.mp4",
-  "./videos/channel2.mp4",
-  "./videos/channel3.mp4",
+    './video/channel1.mp4',
+    './video/channel2.mp4',
+    './video/channel3.mp4'
 ];
 let currentChannel = 0;
 function changeChannel() {
-  if (isTvOn) {
-    currentChannel = (currentChannel + 1) % channels.length;
-    video.src = channels[currentChannel];
-    video.play();
-  }
+    if (isTvOn) {
+        currentChannel = (currentChannel + 1) % channels.length;
+        video.src = channels[currentChannel];
+        video.play();
+    }
 }
 
-// 5.3. Bật/Tắt màn hình TV và ánh sáng---------------------------------------------------------------------------
+
+// 6.3. Bật/Tắt màn hình TV và ánh sáng---------------------------------------------------------------------------
 function toggleTvAndSpotLight() {
-  if (tvScreenMesh) {
+if (tvScreenMesh) {
     // Đảo trạng thái của TV
     isTvOn = !isTvOn;
 
     if (isTvOn) {
-      // Khi bật TV
-      tvScreenMesh.material.map = videoTexture; // Hiển thị video
-      video.play(); // Phát video
-      spotLight.intensity = 75000; // Bật ánh sáng
+        // Khi bật TV
+        tvScreenMesh.material.map = videoTexture; // Hiển thị video
+        video.play(); // Phát video
+        spotLight.intensity = 75000; // Bật ánh sáng
     } else {
-      // Khi tắt TV
-      tvScreenMesh.material.map = blackTexture; // Hiển thị màn hình đen
-      video.pause(); // Tạm dừng video
-      spotLight.intensity = 0; // Tắt ánh sáng
+        // Khi tắt TV
+        tvScreenMesh.material.map = blackTexture; // Hiển thị màn hình đen
+        video.pause(); // Tạm dừng video
+        spotLight.intensity = 0; // Tắt ánh sáng
     }
-
-    console.log("TV is now", isTvOn ? "ON" : "OFF");
-    console.log("SpotLight is now", isTvOn ? "ON" : "OFF");
-  }
+}
 }
 
-// 5.4. Đảm bảo phát âm thanh sau tương tác---------------------------------------------------------------------------
+
+// 6.4. Đảm bảo phát âm thanh sau tương tác---------------------------------------------------------------------------
 function enableAudioPlayback() {
-  video
-    .play()
-    .then(() => {
-      console.log("Video playback started with sound");
-    })
-    .catch((error) => {
-      console.error("Error enabling audio playback:", error);
-    });
-  // 5.5. Đảm bảo video không phát khi gắn vào texture---------------------------------------------------------------------------
-  video.addEventListener("play", () => {
-    if (!isTvOn) {
+video.play().then(() => {
+    console.log('Video playback started with sound');
+}).catch((error) => {
+    console.error('Error enabling audio playback:', error);
+});
+// 6.5. Đảm bảo video không phát khi gắn vào texture---------------------------------------------------------------------------
+video.addEventListener('play', () => {
+  if (!isTvOn) {
       video.pause(); // Dừng phát nếu TV chưa bật
-    }
-  });
-
-  // 5.6. Xóa sự kiện sau khi kích hoạt âm thanh---------------------------------------------------------------------------
-  window.removeEventListener("click", enableAudioPlayback);
-  window.removeEventListener("keydown", enableAudioPlayback);
-}
-
-// 5.7. Gắn sự kiện phát âm thanh---------------------------------------------------------------------------
-window.addEventListener("click", enableAudioPlayback);
-window.addEventListener("keydown", enableAudioPlayback);
-
-// 5.8. Gắn sự kiện vào nút HTML---------------------------------------------------------------------------
-const button = document.getElementById("toggle-tv-and-spotlight");
-button.addEventListener("click", toggleTvAndSpotLight);
-
-// 5.9. Space để đổi kênh---------------------------------------------------------------------------
-window.addEventListener("keydown", (event) => {
-  if (event.code === "Space") {
-    changeChannel();
   }
 });
 
-//6. Ánh sáng---------------------------------------------------------------------------
-// 6.1. Ánh sáng môi trường
+// 6.6. Xóa sự kiện sau khi kích hoạt âm thanh---------------------------------------------------------------------------
+window.removeEventListener('click', enableAudioPlayback);
+window.removeEventListener('keydown', enableAudioPlayback);
+}
+
+// 6.7. Gắn sự kiện phát âm thanh---------------------------------------------------------------------------
+window.addEventListener('click', enableAudioPlayback);
+window.addEventListener('keydown', enableAudioPlayback);
+
+// 6.8. Gắn sự kiện vào nút HTML---------------------------------------------------------------------------
+const button = document.getElementById('toggle-tv-and-spotlight');
+button.addEventListener('click', toggleTvAndSpotLight);
+
+
+
+// 6.9. Space để đổi kênh---------------------------------------------------------------------------
+window.addEventListener('keydown', (event) => {
+    if (event.code === 'Space') {
+        changeChannel();
+    }
+ });
+
+//7. Ánh sáng---------------------------------------------------------------------------
+// 7.1. Ánh sáng môi trường
 const light = new THREE.AmbientLight(0xffffff); // soft white light
 scene.add(light);
 
-// 6.2. Ánh sáng đèn HQ
+// 7.2. Ánh sáng đèn HQ
 const pLight1 = new THREE.PointLight(0xffffff, 10000, 1000);
 pLight1.position.set(-80, 225, 0);
 scene.add(pLight1);
@@ -263,7 +307,7 @@ const pLight3 = pLight1.clone();
 pLight3.position.set(-150, 225, 0);
 scene.add(pLight3);
 
-// 6.3. Ánh sáng TV
+// 7.3. Ánh sáng TV
 const spotLight = new THREE.SpotLight(0x99ffff, 50000);
 spotLight.position.set(-80, 125, 210);
 spotLight.angle = Math.PI / 6.25;
@@ -278,13 +322,13 @@ spotLight.target.updateMatrixWorld(); // Cập nhật lại vị trí target
 // const spotLightHelper = new THREE.SpotLightHelper( spotLight );
 // scene.add( spotLightHelper );
 
-//6.4. Ánh sáng mặt trời
+//7.4. Ánh sáng mặt trời
 const directionalLight = new THREE.DirectionalLight( 0xFFFF99, 1 ); // Màu vàng
   directionalLight.castShadow = true;
   directionalLight.position.set (10000, 10000, 10000);
   scene.add( directionalLight );
   
-// 7. Vòng lặp Animate------------------------------------------------------------------------
+// 8. Vòng lặp Animate------------------------------------------------------------------------
 function animate() {
   // console.log(camera.position); // in vị trí của camera trong console
   // console.log("Góc quay chiều ngang: " + controls.getAzimuthalAngle() * (180 / Math.PI));
@@ -294,6 +338,7 @@ function animate() {
   renderer.render(scene, camera);
 }
 
-// 8. Other stuff ---------------------------------------------------------------------------
+// 9. Other stuff ---------------------------------------------------------------------------
 const axesHelper = new THREE.AxesHelper(500);
 scene.add(axesHelper);
+// Màu đỏ -> x; Màu xanh nước biển -> z; Màu xanh lá -> y
