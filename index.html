@@ -1,15 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Nhóm 5 | PROJECT GIỮA KÌ</title>
+<head>
+    <body>
+        <!-- Video được sử dụng làm texture cho TV -->
+        <video id="tv-video" loop playsinline>
+            <source src="./videos/channel1.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    
+        <!-- Nút bật/tắt màn hình TV -->
+        <button id="toggle-tv">ON/OFF</button>
+    
+        <!-- Tệp JavaScript chính -->
+        <script type="module" src="/main.js"></script>
+    </body>
+    <meta charset="utf-8">
+    <title>My Three.js TV App</title>
     <style>
-      body {
-        margin: 0;
-      }
+        body { margin: 0; overflow: hidden; }
+        video { display: none; } /* Ẩn video trên giao diện */
+        button {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 100;
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
     </style>
-  </head>
-  <body>
-    <script type="module" src="main.js"></script>
-  </body>
+    <button id="toggle-tv-and-spotlight">ON / OFF</button>
+
+
+</head>
 </html>
