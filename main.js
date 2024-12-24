@@ -7,12 +7,12 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(
-  90, // độ xa của camera
+  60, // độ mở của camera
   window.innerWidth / window.innerHeight, // tỉ lệ khung hình
   0.1, // khoảng cách gần nhất thấy được
   1500 // khoảng cách xa nhất thấy được
 );
-camera.position.set(-150, 200, -200);
+camera.position.set(-150, 200, -220);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -20,6 +20,12 @@ renderer.setAnimationLoop(animate);
 document.body.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(-80, 0, 200); // TV
+controls.minPolarAngle = 60 * (Math.PI / 180);
+controls.maxPolarAngle = 88 * (Math.PI / 180);
+controls.minAzimuthAngle = -170 * (Math.PI / 180);
+controls.maxAzimuthAngle = -90 * (Math.PI / 180);
+// controls.maxDistance = 540;
 
 // 2. Background set up ---------------------------------------------------------
 scene.background = new THREE.Color(0xffffff); // Background màu trắng
@@ -157,19 +163,22 @@ loader.load(
 
 // 4. Ánh sáng ----------------------------------------------------------------------
 // Ánh sáng đèn huỳnh quang
-const pLight1 = new THREE.PointLight( 0xFFFFFF, 10000, 1000 );
-pLight1.position.set( -80, 225, 0 );
-scene.add( pLight1 );
-const pLight2 = new THREE.PointLight( 0xFFFFFF, 10000, 1000 );
-pLight2.position.set( -10, 225, 0 );
-scene.add( pLight2 );
-const pLight3 = new THREE.PointLight( 0xFFFFFF, 10000, 1000 );
-pLight3.position.set( -150, 225, 0 );
-scene.add( pLight3 );
+const pLight1 = new THREE.PointLight(0xffffff, 10000, 1000);
+pLight1.position.set(-80, 225, 0);
+scene.add(pLight1);
+const pLight2 = new THREE.PointLight(0xffffff, 10000, 1000);
+pLight2.position.set(-10, 225, 0);
+scene.add(pLight2);
+const pLight3 = new THREE.PointLight(0xffffff, 10000, 1000);
+pLight3.position.set(-150, 225, 0);
+scene.add(pLight3);
 
 // 5. Animate ---------------------------------------------------------------------------
 function animate() {
-  console.log(camera.position); // in vị trí của camera trong console
+  // console.log(camera.position); // in vị trí của camera trong console
+  // console.log(    "Góc quay chiều ngang: " + controls.getAzimuthalAngle() * (180 / Math.PI));
+  console.log("Góc quay chiều dọc: " + controls.getPolarAngle() * (180 / Math.PI));
+  console.log("Khoảng cách từ camera đến target: " + controls.getDistance());
   controls.update();
   renderer.render(scene, camera);
 }

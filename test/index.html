@@ -103,14 +103,20 @@
       gui.add(minMaxGUIHelper, "max", 0.1, 10000, 0.1).name("far");
 
       const controls = new OrbitControls(camera, view1Elem);
-      controls.target.set(0, 5, 0);
+      // controls.target.set(0, 5, 0); // TV
+      controls.target.set(-80, 0, 200); // TV
+      // controls.target.set(-80, 65, -260); // Sofa 
+      controls.minPolarAngle = 60 * (Math.PI/180);
+      controls.maxPolarAngle = 88 * (Math.PI/180);
+      controls.minAzimuthAngle = 175 * (Math.PI/180);
+      controls.maxAzimuthAngle = -80 * (Math.PI/180);
       controls.update();
 
       const camera2 = new THREE.PerspectiveCamera(
         90, // fov
         2, // aspect
         0.1, // near
-        1000 // far
+        9000 // far
       );
       camera2.position.set(-200, 230, -300);
       camera2.lookAt(0,5,0);
@@ -400,8 +406,9 @@
         }
 
         requestAnimationFrame(render);
-        console.log(camera.position);
-        console.log(camera.rotation);
+        // console.log(camera.position);
+        // console.log("Góc quay chiều ngang: " + controls.getAzimuthalAngle() * (180 / Math.PI));
+        console.log("Góc quay chiều dọc: " + controls.getPolarAngle() * (180 / Math.PI));
       }
 
       requestAnimationFrame(render);
