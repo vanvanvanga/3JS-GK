@@ -23,11 +23,33 @@ import * as THREE from 'three';
 
   // 3. Background setup---------------------------------------------------------------------------
   scene.background = new THREE.Color(0xffffff); // Background màu trắng
+    // Ánh sáng
   const ambientLight = new THREE.AmbientLight(0xffffff, 1); // Màu vàng
   scene.add(ambientLight);
-
- 
-
+  const pointLight1 = new THREE.PointLight( 0xFFFFFF, 10000, 1000 ); // Màu trắng
+  pointLight1.position.set( -80, 225, 0 );
+  scene.add( pointLight1 );
+  const pointLight2 = new THREE.PointLight( 0xFFFFFF, 10000, 1000 ); // Màu trắng
+  pointLight2.position.set( -10, 225, 0 );
+  scene.add( pointLight2 );
+  const pointLight3 = new THREE.PointLight( 0xFFFFFF, 10000, 1000 ); // Màu trắng
+  pointLight3.position.set( -150, 225, 0 );
+  scene.add( pointLight3 );
+  const directionalLight = new THREE.DirectionalLight( 0xFFFF99, 1 ); // Màu vàng
+  directionalLight.castShadow = true;
+  directionalLight.position.set (10000, 10000, 10000);
+  scene.add( directionalLight );
+  const spotLight = new THREE.SpotLight( 0x99FFFF, 50000); // Màu xanh dương
+  spotLight.position.set(-80, 125, 210);
+  spotLight.angle = Math.PI / 6.25; // Góc rộng của ánh sáng
+  spotLight.distance = 500;
+  scene.add( spotLight );
+  spotLight.intensity = 0;
+  const targetObject = new THREE.Object3D(); // Hướng ánh sáng tới
+  scene.add(targetObject);
+  targetObject.position.set (-100, 50, -500);
+  spotLight.target = targetObject;
+  spotLight.target.updateMatrixWorld();
 
   // 4. Objects (+ positioning, lighting) ---------------------------------------------------------
   const loader = new GLTFLoader();
@@ -246,42 +268,13 @@ let isTvOn = false;
       }
    });
 
-
-  //6. Ánh sáng---------------------------------------------------------------------------
-  const ambientLight = new THREE.AmbientLight(0xffffff, 1); // Màu vàng
-  scene.add(ambientLight);
-  const pointLight1 = new THREE.PointLight( 0xFFFFFF, 10000, 1000 ); // Màu trắng
-  pointLight1.position.set( -80, 225, 0 );
-  scene.add( pointLight1 );
-  const pointLight2 = new THREE.PointLight( 0xFFFFFF, 10000, 1000 ); // Màu trắng
-  pointLight2.position.set( -10, 225, 0 );
-  scene.add( pointLight2 );
-  const pointLight3 = new THREE.PointLight( 0xFFFFFF, 10000, 1000 ); // Màu trắng
-  pointLight3.position.set( -150, 225, 0 );
-  scene.add( pointLight3 );
-  const directionalLight = new THREE.DirectionalLight( 0xFFFF99, 1 ); // Màu vàng
-  directionalLight.castShadow = true;
-  directionalLight.position.set (10000, 10000, 10000);
-  scene.add( directionalLight );
-  const spotLight = new THREE.SpotLight( 0x99FFFF, 50000); // Màu xanh dương
-  spotLight.position.set(-80, 125, 210);
-  spotLight.angle = Math.PI / 6.25; // Góc rộng của ánh sáng
-  spotLight.distance = 500;
-  scene.add( spotLight );
-  spotLight.intensity = 0;
-  const targetObject = new THREE.Object3D(); // Hướng ánh sáng tới
-  scene.add(targetObject);
-  targetObject.position.set (-100, 50, -500);
-  spotLight.target = targetObject;
-  spotLight.target.updateMatrixWorld();
-
-  // 7. Vòng lặp Animate------------------------------------------------------------------------
+  // 6. Vòng lặp Animate------------------------------------------------------------------------
   function animate() {
     controls.update();
     renderer.render(scene, camera);
 }
 
 
-  // 8. Other stuff ---------------------------------------------------------------------------
+  // 7. Other stuff ---------------------------------------------------------------------------
   const axesHelper = new THREE.AxesHelper(500);
   scene.add(axesHelper);
