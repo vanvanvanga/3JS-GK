@@ -278,6 +278,12 @@ spotLight.target.updateMatrixWorld(); // Cập nhật lại vị trí target
 // const spotLightHelper = new THREE.SpotLightHelper( spotLight );
 // scene.add( spotLightHelper );
 
+//6.4. Ánh sáng mặt trời
+const directionalLight = new THREE.DirectionalLight( 0xFFFF99, 1 ); // Màu vàng
+  directionalLight.castShadow = true;
+  directionalLight.position.set (10000, 10000, 10000);
+  scene.add( directionalLight );
+  
 // 7. Vòng lặp Animate------------------------------------------------------------------------
 function animate() {
   // console.log(camera.position); // in vị trí của camera trong console
