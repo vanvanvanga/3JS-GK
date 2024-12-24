@@ -7,11 +7,12 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(
-  75, // độ xa của camera
+  90, // độ xa của camera
   window.innerWidth / window.innerHeight, // tỉ lệ khung hình
   0.1, // khoảng cách gần nhất thấy được
-  9000 // khoảng cách xa nhất thấy được
+  1500 // khoảng cách xa nhất thấy được
 );
+camera.position.set(-150, 200, -200);
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -78,6 +79,7 @@ loader.load(
     scene.add(model.scene);
     model.scene.scale.set(5, 5, 5);
     model.scene.position.set(-150, 58, -75);
+    // model.scene.position.set(-150, 58, -75);
   },
   undefined,
   function (error) {
@@ -153,7 +155,8 @@ loader.load(
   }
 );
 
-// Ánh sáng
+// 4. Ánh sáng ----------------------------------------------------------------------
+// Ánh sáng đèn huỳnh quang
 const pLight1 = new THREE.PointLight( 0xFFFFFF, 10000, 1000 );
 pLight1.position.set( -80, 225, 0 );
 scene.add( pLight1 );
@@ -163,9 +166,6 @@ scene.add( pLight2 );
 const pLight3 = new THREE.PointLight( 0xFFFFFF, 10000, 1000 );
 pLight3.position.set( -150, 225, 0 );
 scene.add( pLight3 );
-
-// 4. Camera position setup ----------------------------------------------------------------------
-camera.position.set(50, 1, -55);
 
 // 5. Animate ---------------------------------------------------------------------------
 function animate() {
