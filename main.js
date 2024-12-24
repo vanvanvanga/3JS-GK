@@ -149,15 +149,19 @@ const curtainTexture = new THREE.TextureLoader().load('curtain.png');
 const txtRem = new THREE.MeshStandardMaterial({ map: curtainTexture });
 const curtainGeometry = new THREE.BoxGeometry(0.01, 20, 12);
 const curtainLeft = new THREE.Mesh(curtainGeometry, txtRem); 
-const curtainRight = curtainLeft.clone(); 
+const curtainRight = curtainLeft.clone();
+curtainLeft.receiveShadow = true;
+curtainRight.receiveShadow = true;
 scene.add ( curtainRight );
 scene.add ( curtainLeft );
  
 // 5.2. Thanh treo rèm
+const curtainRodTexture = new THREE.TextureLoader().load('curtainRod.png');
+const txtThanhTreo = new THREE.MeshStandardMaterial({ map: curtainRodTexture });
 const geometry = new THREE.CylinderGeometry( 0.5, 0.5, 30, 100 ); 
-const material = new THREE.MeshBasicMaterial( {color: 0xffffff} ); 
-const cylinder = new THREE.Mesh( geometry, material ); 
+const cylinder = new THREE.Mesh( geometry, txtThanhTreo ); 
 cylinder.rotation.x = Math.PI / 2;
+cylinder.receiveShadow = true;
 scene.add( cylinder );
 
 // 5.3 Resize lại rèm cửa
