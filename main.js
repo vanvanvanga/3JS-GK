@@ -154,8 +154,6 @@ loader.load(
 );
 
 // Ánh sáng
-const aLight = new THREE.AmbientLight( 0xffffff );
-scene.add( aLight );
 const pLight1 = new THREE.PointLight( 0xFFFFFF, 10000, 1000 );
 pLight1.position.set( -80, 225, 0 );
 scene.add( pLight1 );
