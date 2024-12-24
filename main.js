@@ -25,7 +25,7 @@ controls.minPolarAngle = 60 * (Math.PI / 180);
 controls.maxPolarAngle = 88 * (Math.PI / 180);
 controls.minAzimuthAngle = -170 * (Math.PI / 180);
 controls.maxAzimuthAngle = -90 * (Math.PI / 180);
-// controls.maxDistance = 540;
+controls.maxDistance = 470;
 
 // 3. Background setup---------------------------------------------------------------------------
 scene.background = new THREE.Color(0xffffff); // Background màu trắng
@@ -149,101 +149,101 @@ new GLTFLoader().load("model/GK-tv.glb", function (tv) {
   tv.scene.rotation.set(0, -3.14, 0);
   tv.scene.scale.set(260, 220, 260);
 
-  tv.scene.traverse(function (child) {
-    if (child.isMesh && child.name === "TV1_Screen_0") {
-      tvScreenMesh = child;
-      tvScreenMesh.material = new THREE.MeshBasicMaterial({
-        map: blackTexture,
-      });
-    }
-  });
+  // tv.scene.traverse(function (child) {
+  //   if (child.isMesh && child.name === "TV1_Screen_0") {
+  //     tvScreenMesh = child;
+  //     tvScreenMesh.material = new THREE.MeshBasicMaterial({
+  //       map: blackTexture,
+  //     });
+  //   }
+  // });
 });
 
-// 5.1. Video và Texture---------------------------------------------------------------------------
-const video = document.getElementById("tv-video");
-video.muted = false;
-video.volume = 1.0;
-video.pause();
-video.currentTime = 0; // Đặt lại thời gian phát về đầu
-const videoTexture = new THREE.VideoTexture(video);
-const blackTexture = new THREE.TextureLoader().load("textures/black.png");
-let tvScreenMesh = null;
-let isTvOn = false;
+// // 5.1. Video và Texture---------------------------------------------------------------------------
+// const video = document.getElementById("tv-video");
+// video.muted = false;
+// video.volume = 1.0;
+// video.pause();
+// video.currentTime = 0; // Đặt lại thời gian phát về đầu
+// const videoTexture = new THREE.VideoTexture(video);
+// const blackTexture = new THREE.TextureLoader().load("textures/black.png");
+// let tvScreenMesh = null;
+// let isTvOn = false;
 
-// 5.2. Đổi kênh---------------------------------------------------------------------------
-const channels = [
-  "./videos/channel1.mp4",
-  "./videos/channel2.mp4",
-  "./videos/channel3.mp4",
-];
-let currentChannel = 0;
-function changeChannel() {
-  if (isTvOn) {
-    currentChannel = (currentChannel + 1) % channels.length;
-    video.src = channels[currentChannel];
-    video.play();
-  }
-}
+// // 5.2. Đổi kênh---------------------------------------------------------------------------
+// const channels = [
+//   "./videos/channel1.mp4",
+//   "./videos/channel2.mp4",
+//   "./videos/channel3.mp4",
+// ];
+// let currentChannel = 0;
+// function changeChannel() {
+//   if (isTvOn) {
+//     currentChannel = (currentChannel + 1) % channels.length;
+//     video.src = channels[currentChannel];
+//     video.play();
+//   }
+// }
 
-// 5.3. Bật/Tắt màn hình TV và ánh sáng---------------------------------------------------------------------------
-function toggleTvAndSpotLight() {
-  if (tvScreenMesh) {
-    // Đảo trạng thái của TV
-    isTvOn = !isTvOn;
+// // 5.3. Bật/Tắt màn hình TV và ánh sáng---------------------------------------------------------------------------
+// function toggleTvAndSpotLight() {
+//   if (tvScreenMesh) {
+//     // Đảo trạng thái của TV
+//     isTvOn = !isTvOn;
 
-    if (isTvOn) {
-      // Khi bật TV
-      tvScreenMesh.material.map = videoTexture; // Hiển thị video
-      video.play(); // Phát video
-      spotLight.intensity = 75000; // Bật ánh sáng
-    } else {
-      // Khi tắt TV
-      tvScreenMesh.material.map = blackTexture; // Hiển thị màn hình đen
-      video.pause(); // Tạm dừng video
-      spotLight.intensity = 0; // Tắt ánh sáng
-    }
+//     if (isTvOn) {
+//       // Khi bật TV
+//       tvScreenMesh.material.map = videoTexture; // Hiển thị video
+//       video.play(); // Phát video
+//       spotLight.intensity = 75000; // Bật ánh sáng
+//     } else {
+//       // Khi tắt TV
+//       tvScreenMesh.material.map = blackTexture; // Hiển thị màn hình đen
+//       video.pause(); // Tạm dừng video
+//       spotLight.intensity = 0; // Tắt ánh sáng
+//     }
 
-    console.log("TV is now", isTvOn ? "ON" : "OFF");
-    console.log("SpotLight is now", isTvOn ? "ON" : "OFF");
-  }
-}
+//     console.log("TV is now", isTvOn ? "ON" : "OFF");
+//     console.log("SpotLight is now", isTvOn ? "ON" : "OFF");
+//   }
+// }
 
-// 5.4. Đảm bảo phát âm thanh sau tương tác---------------------------------------------------------------------------
-function enableAudioPlayback() {
-  video
-    .play()
-    .then(() => {
-      console.log("Video playback started with sound");
-    })
-    .catch((error) => {
-      console.error("Error enabling audio playback:", error);
-    });
-  // 5.5. Đảm bảo video không phát khi gắn vào texture---------------------------------------------------------------------------
-  video.addEventListener("play", () => {
-    if (!isTvOn) {
-      video.pause(); // Dừng phát nếu TV chưa bật
-    }
-  });
+// // 5.4. Đảm bảo phát âm thanh sau tương tác---------------------------------------------------------------------------
+// function enableAudioPlayback() {
+//   video
+//     .play()
+//     .then(() => {
+//       console.log("Video playback started with sound");
+//     })
+//     .catch((error) => {
+//       console.error("Error enabling audio playback:", error);
+//     });
+//   // 5.5. Đảm bảo video không phát khi gắn vào texture---------------------------------------------------------------------------
+//   video.addEventListener("play", () => {
+//     if (!isTvOn) {
+//       video.pause(); // Dừng phát nếu TV chưa bật
+//     }
+//   });
 
-  // 5.6. Xóa sự kiện sau khi kích hoạt âm thanh---------------------------------------------------------------------------
-  window.removeEventListener("click", enableAudioPlayback);
-  window.removeEventListener("keydown", enableAudioPlayback);
-}
+//   // 5.6. Xóa sự kiện sau khi kích hoạt âm thanh---------------------------------------------------------------------------
+//   window.removeEventListener("click", enableAudioPlayback);
+//   window.removeEventListener("keydown", enableAudioPlayback);
+// }
 
-// 5.7. Gắn sự kiện phát âm thanh---------------------------------------------------------------------------
-window.addEventListener("click", enableAudioPlayback);
-window.addEventListener("keydown", enableAudioPlayback);
+// // 5.7. Gắn sự kiện phát âm thanh---------------------------------------------------------------------------
+// window.addEventListener("click", enableAudioPlayback);
+// window.addEventListener("keydown", enableAudioPlayback);
 
-// 5.8. Gắn sự kiện vào nút HTML---------------------------------------------------------------------------
-const button = document.getElementById("toggle-tv-and-spotlight");
-button.addEventListener("click", toggleTvAndSpotLight);
+// // 5.8. Gắn sự kiện vào nút HTML---------------------------------------------------------------------------
+// const button = document.getElementById("toggle-tv-and-spotlight");
+// button.addEventListener("click", toggleTvAndSpotLight);
 
-// 5.9. Space để đổi kênh---------------------------------------------------------------------------
-window.addEventListener("keydown", (event) => {
-  if (event.code === "Space") {
-    changeChannel();
-  }
-});
+// // 5.9. Space để đổi kênh---------------------------------------------------------------------------
+// window.addEventListener("keydown", (event) => {
+//   if (event.code === "Space") {
+//     changeChannel();
+//   }
+// });
 
 //6. Ánh sáng---------------------------------------------------------------------------
 // 6.1. Ánh sáng môi trường
@@ -278,18 +278,22 @@ spotLight.target.updateMatrixWorld(); // Cập nhật lại vị trí target
 // const spotLightHelper = new THREE.SpotLightHelper( spotLight );
 // scene.add( spotLightHelper );
 
-//6.4. Ánh sáng mặt trời
-const directionalLight = new THREE.DirectionalLight( 0xFFFF99, 1 ); // Màu vàng
-  directionalLight.castShadow = true;
-  directionalLight.position.set (10000, 10000, 10000);
-  scene.add( directionalLight );
-  
+// //6.4. Ánh sáng mặt trời
+// const directionalLight = new THREE.DirectionalLight( 0xFFFF99, 1 ); // Màu vàng
+//   directionalLight.castShadow = true;
+//   directionalLight.position.set (10000, 10000, 10000);
+//   scene.add( directionalLight );
+
 // 7. Vòng lặp Animate------------------------------------------------------------------------
+let min = new THREE.Vector3(-200, 5, -100);
+let max = new THREE.Vector3(200, 100, 80);
+
 function animate() {
-  // console.log(camera.position); // in vị trí của camera trong console
+  console.log("Tọa độ camera: " + camera.position.toArray()); // in vị trí của camera trong console
   // console.log("Góc quay chiều ngang: " + controls.getAzimuthalAngle() * (180 / Math.PI));
-  console.log("Góc quay chiều dọc: " + controls.getPolarAngle() * (180 / Math.PI));
-  console.log("Khoảng cách từ camera đến target: " + controls.getDistance());
+  // console.log("Góc quay chiều dọc: " + controls.getPolarAngle() * (180 / Math.PI));
+  // console.log("Khoảng cách từ camera đến target: " + controls.getDistance());
+  controls.target.clamp(min, max);
   controls.update();
   renderer.render(scene, camera);
 }
