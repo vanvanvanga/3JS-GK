@@ -164,7 +164,7 @@ import * as THREE from 'three';
   cube.scale.set(50, 100, 100);
 
   // 5. TV + Opption 1:---------------------------------------------------------------------------
-  new GLTFLoader().load('model/tv.glb',
+  new GLTFLoader().load('model/GK-tv.glb',
       function (tv) {
           scene.add(tv.scene);
           tv.scene.position.set(-80, 50, 200);
