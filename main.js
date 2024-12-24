@@ -2,6 +2,7 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { gsap } from 'gsap';
 
 // 1. Create Scene, Camera, Renderer -------------------------------------------------------------
 const scene = new THREE.Scene();
