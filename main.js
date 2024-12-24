@@ -27,163 +27,276 @@ controls.minAzimuthAngle = -170 * (Math.PI / 180);
 controls.maxAzimuthAngle = -90 * (Math.PI / 180);
 // controls.maxDistance = 540;
 
-// 2. Background set up ---------------------------------------------------------
-scene.background = new THREE.Color(0xffffff); // Background màu trắng
 
-const ambientLight = new THREE.AmbientLight(0xffffff, 1); // Màu vàng
-scene.add(ambientLight);
+  // 2. Camera---------------------------------------------------------------------------
+  camera.position.set(5, 5, 5);
 
-// 3. Objects (+ positioning, lighting) ---------------------------------------------------------
-const loader = new GLTFLoader();
 
-// Căn phòng:
-loader.load(
-  "/model/GK-room.glb",
-  function (model) {
-    scene.add(model.scene);
-    model.scene.scale.set(2, 1, 2);
-    model.scene.position.x = 150;
-  },
-  undefined,
-  function (error) {
+
+  // 3. Background setup---------------------------------------------------------------------------
+  scene.background = new THREE.Color(0xffffff); // Background màu trắng
+  const ambientLight = new THREE.AmbientLight(0xffffff, 1); // Màu vàng
+  scene.add(ambientLight);
+
+ 
+
+
+  // 4. Objects (+ positioning, lighting) ---------------------------------------------------------
+  const loader = new GLTFLoader();
+
+  // 4.1. Căn phòng:---------------------------------------------------------------------------
+  loader.load(
+    "/model/room.glb",
+    function (model) {
+      scene.add(model.scene);
+      model.scene.scale.set(2, 1, 2);
+      model.scene.position.x = 150;
+    },
+    undefined,
+    function (error) {
+      console.error(error);
+    }
+  );
+
+  // 4.2. Sofa:---------------------------------------------------------------------------
+  loader.load(
+    "/model/_sofa.glb",
+    function (model) {
+      scene.add(model.scene);
+      model.scene.scale.set(200, 200, 200);
+      model.scene.position.set(-80, 65, -260);
+    },
+    undefined,
+    function (error) {
     console.error(error);
+    }
+  );
+
+  // 4.3. Bàn ăn:---------------------------------------------------------------------------
+  loader.load(
+    "/model/table.glb",
+    function (model) {
+      scene.add(model.scene);
+      model.scene.scale.set(210, 90, 150);
+      model.scene.position.set(-80, 0, -60);
+    },
+    undefined,
+    function (error) {
+      console.error(error);
+    }
+  );
+
+  // 4.4. Đĩa thức ăn:---------------------------------------------------------------------------
+  loader.load(
+    "/model/pasta.glb",
+    function (model) {
+      scene.add(model.scene);
+      model.scene.scale.set(5, 5, 5);
+      model.scene.position.set(-150, 58, -75);
+    },
+    undefined,
+    function (error) {
+      console.error(error);
+    }
+  );
+
+  // 4.5. Đèn huỳnh quang:---------------------------------------------------------------------------
+  // 4.5.1 Đèn:---------------------------------------------------------------------------
+  const loadLightTexture = new THREE.TextureLoader().load(
+    "/textures/lightTexture.jpg"
+  );
+  const txtDen = new THREE.MeshPhongMaterial({ map: loadLightTexture });
+  const hinhTru = new THREE.CylinderGeometry(0.2, 0.2, 10, 100);
+  const den = new THREE.Mesh(hinhTru, txtDen);
+  scene.add(den);
+
+  // 4.6. Đế:---------------------------------------------------------------------------
+  const loadPanelTexture = new THREE.TextureLoader().load("panel.jpg");
+  const txtDe = new THREE.MeshPhongMaterial({ map: loadPanelTexture });
+  const hinhHop = new THREE.BoxGeometry(0.45, 10.5, 0.3);
+  const de = new THREE.Mesh(hinhHop, txtDe);
+  scene.add(de);
+  de.position.set(0, 1.2, 0);
+
+  // 4.7. Resize lại đèn HQ:---------------------------------------------------------------------------
+  den.scale.set(20, 20, 20);
+  de.scale.set(20, 20, 20);
+
+  // 4.7.1 Đặt vị trí đèn HQ:---------------------------------------------------------------------------
+  den.position.y += 235;
+  de.position.y += 235;
+  den.position.x -= 80;
+  de.position.x -= 80;
+
+  // 4.7.2 Xoay ngang đèn HQ:---------------------------------------------------------------------------
+  den.rotation.x += 3.14 / 2;
+  de.rotation.x += 3.14 / 2;
+  den.rotation.z += 3.14 / 2;
+  de.rotation.z += 3.14 / 2;
+
+  // 4.7. Đèn 2---------------------------------------------------------------------------
+  const den2 = den.clone();
+  scene.add(den2);
+  den2.position.z -= 10;
+
+  // 4.8. Đế 2:---------------------------------------------------------------------------
+  const de2 = de.clone();
+  scene.add(de2);
+  de2.position.z -= 10;
+
+  // 4.9. Kệ TV:---------------------------------------------------------------------------
+  const Boxtexture = new THREE.TextureLoader().load("/textures/go.jpg");
+  const boxmaterial = new THREE.MeshStandardMaterial({ map: Boxtexture });
+  const boxgeometry = new THREE.BoxGeometry(5, 1, 1);
+  const cube = new THREE.Mesh(boxgeometry, boxmaterial);
+  scene.add(cube);
+  cube.position.set(-80, 0, 200);
+  cube.scale.set(50, 100, 100);
+
+  // 5. TV + Opption 1:---------------------------------------------------------------------------
+  new GLTFLoader().load('model/tv.glb',
+      function (tv) {
+          scene.add(tv.scene);
+          tv.scene.position.set(-80, 50, 200);
+          tv.scene.rotation.set(0, -3.14, 0);
+          tv.scene.scale.set(260, 220, 260);
+
+          tv.scene.traverse(function (child) {
+              if (child.isMesh && child.name === 'TV1_Screen_0') {
+                  tvScreenMesh = child;
+                  tvScreenMesh.material = new THREE.MeshBasicMaterial({ map: blackTexture });
+              }
+          });
+      }
+  );
+
+
+  // 5.1. Video và Texture---------------------------------------------------------------------------
+  const video = document.getElementById('tv-video');
+video.muted = false;
+video.volume = 1.0;
+video.pause();
+video.currentTime = 0; // Đặt lại thời gian phát về đầu
+const videoTexture = new THREE.VideoTexture(video);
+const blackTexture = new THREE.TextureLoader().load('textures/black.png');
+let tvScreenMesh = null;
+let isTvOn = false;
+
+  // 5.2. Đổi kênh---------------------------------------------------------------------------
+  const channels = [
+      './videos/channel1.mp4',
+      './videos/channel2.mp4',
+      './videos/channel3.mp4'
+  ];
+  let currentChannel = 0;
+  function changeChannel() {
+      if (isTvOn) {
+          currentChannel = (currentChannel + 1) % channels.length;
+          video.src = channels[currentChannel];
+          video.play();
+      }
   }
-);
 
-// Sofa:
-loader.load(
-  "/model/GK-sofa.glb",
-  function (model) {
-    scene.add(model.scene);
-    model.scene.scale.set(200, 200, 200);
-    model.scene.position.set(-80, 65, -260);
-  },
-  undefined,
-  function (error) {
-    console.error(error);
+
+  // 5.3. Bật/Tắt màn hình TV và ánh sáng---------------------------------------------------------------------------
+  function toggleTvAndSpotLight() {
+  if (tvScreenMesh) {
+      // Đảo trạng thái của TV
+      isTvOn = !isTvOn;
+
+      if (isTvOn) {
+          // Khi bật TV
+          tvScreenMesh.material.map = videoTexture; // Hiển thị video
+          video.play(); // Phát video
+          spotLight.intensity = 75000; // Bật ánh sáng
+      } else {
+          // Khi tắt TV
+          tvScreenMesh.material.map = blackTexture; // Hiển thị màn hình đen
+          video.pause(); // Tạm dừng video
+          spotLight.intensity = 0; // Tắt ánh sáng
+      }
+
+      console.log("TV is now", isTvOn ? "ON" : "OFF");
+      console.log("SpotLight is now", isTvOn ? "ON" : "OFF");
   }
-);
+}
 
-// Bàn ăn:
-loader.load(
-  "/model/GK-table.glb",
-  function (model) {
-    scene.add(model.scene);
-    model.scene.scale.set(210, 90, 150);
-    model.scene.position.set(-80, 0, -60);
-  },
-  undefined,
-  function (error) {
-    console.error(error);
+
+  // 5.4. Đảm bảo phát âm thanh sau tương tác---------------------------------------------------------------------------
+  function enableAudioPlayback() {
+  video.play().then(() => {
+      console.log('Video playback started with sound');
+  }).catch((error) => {
+      console.error('Error enabling audio playback:', error);
+  });
+  // 5.5. Đảm bảo video không phát khi gắn vào texture---------------------------------------------------------------------------
+  video.addEventListener('play', () => {
+    if (!isTvOn) {
+        video.pause(); // Dừng phát nếu TV chưa bật
+    }
+  });
+
+  // 5.6. Xóa sự kiện sau khi kích hoạt âm thanh---------------------------------------------------------------------------
+  window.removeEventListener('click', enableAudioPlayback);
+  window.removeEventListener('keydown', enableAudioPlayback);
   }
-);
 
-// Đĩa thức ăn:
-loader.load(
-  "/model/GK-pasta.glb",
-  function (model) {
-    scene.add(model.scene);
-    model.scene.scale.set(5, 5, 5);
-    model.scene.position.set(-150, 58, -75);
-    // model.scene.position.set(-150, 58, -75);
-  },
-  undefined,
-  function (error) {
-    console.error(error);
-  }
-);
+  // 5.7. Gắn sự kiện phát âm thanh---------------------------------------------------------------------------
+  window.addEventListener('click', enableAudioPlayback);
+  window.addEventListener('keydown', enableAudioPlayback);
 
-// Đèn huỳnh quang:
-// -- Đèn:
-const loadLightTexture = new THREE.TextureLoader().load(
-  "/textures/lightTexture.jpg"
-);
-const txtDen = new THREE.MeshPhongMaterial({ map: loadLightTexture });
-const hinhTru = new THREE.CylinderGeometry(0.2, 0.2, 10, 100);
-const den = new THREE.Mesh(hinhTru, txtDen);
-scene.add(den);
+  // 5.8. Gắn sự kiện vào nút HTML---------------------------------------------------------------------------
+  const button = document.getElementById('toggle-tv-and-spotlight');
+  button.addEventListener('click', toggleTvAndSpotLight);
 
-// -- Đế:
-const loadPanelTexture = new THREE.TextureLoader().load("/textures/panel.jpg");
-const txtDe = new THREE.MeshPhongMaterial({ map: loadPanelTexture });
-const hinhHop = new THREE.BoxGeometry(0.45, 10.5, 0.3);
-const de = new THREE.Mesh(hinhHop, txtDe);
-scene.add(de);
-de.position.set(0, 1.2, 0);
 
-// ---- Resize lại đèn HQ:
-den.scale.set(20, 20, 20);
-de.scale.set(20, 20, 20);
 
-// ---- Đặt vị trí đèn HQ:
-den.position.y += 235;
-de.position.y += 235;
-den.position.x -= 80;
-de.position.x -= 80;
+  // 5.9. Space để đổi kênh---------------------------------------------------------------------------
+  window.addEventListener('keydown', (event) => {
+      if (event.code === 'Space') {
+          changeChannel();
+      }
+   });
 
-// ---- Xoay ngang đèn HQ:
-den.rotation.x += 3.14 / 2;
-de.rotation.x += 3.14 / 2;
-den.rotation.z += 3.14 / 2;
-de.rotation.z += 3.14 / 2;
 
-// -- Đèn 2
-const den2 = den.clone();
-scene.add(den2);
-den2.position.z -= 10;
+  //6. Ánh sáng---------------------------------------------------------------------------
+  const light = new THREE.AmbientLight( 0xffffff ); // soft white light
+  scene.add( light );
+  const pLight1 = new THREE.PointLight( 0xFFFFFF, 10000, 1000 );
+  pLight1.position.set( -80, 225, 0 );
+  scene.add( pLight1 );
+  const pLight2 = new THREE.PointLight( 0xFFFFFF, 10000, 1000 );
+  pLight2.position.set( -10, 225, 0 );
+  scene.add( pLight2 );
+  const pLight3 = new THREE.PointLight( 0xFFFFFF, 10000, 1000 );
+  pLight3.position.set( -150, 225, 0 );
+  scene.add( pLight3 );
+  const spotLight = new THREE.SpotLight( 0x99FFFF, 50000);
+  spotLight.position.set(-80, 125, 210);
+  spotLight.angle = Math.PI / 6.25;
+  spotLight.distance = 500;
+  scene.add( spotLight );
+  spotLight.intensity = 0;
+  const targetObject = new THREE.Object3D(); // Tạo đối tượng làm target
+  scene.add(targetObject); // Thêm target vào scene
+  targetObject.position.set (-100, 50, -500); // Di chuyển target sang phải 1 đơn vị
+  spotLight.target = targetObject; // Gán target cho ánh sáng
+  spotLight.target.updateMatrixWorld(); // Cập nhật lại vị trí target
+  // const spotLightHelper = new THREE.SpotLightHelper( spotLight );
+  // scene.add( spotLightHelper );
 
-// -- Đế 2:
-const de2 = de.clone();
-scene.add(de2);
-de2.position.z -= 10;
-
-// Kệ TV:
-const Boxtexture = new THREE.TextureLoader().load("/textures/go.jpg");
-const boxmaterial = new THREE.MeshStandardMaterial({ map: Boxtexture });
-const boxgeometry = new THREE.BoxGeometry(5, 1, 1);
-const cube = new THREE.Mesh(boxgeometry, boxmaterial);
-scene.add(cube);
-cube.position.set(-80, 0, 200);
-cube.scale.set(50, 100, 100);
-
-// TV:
-loader.load(
-  "/model/GK-tv.glb",
-  function (model) {
-    scene.add(model.scene);
-    model.scene.rotation.set(0, -3.14, 0);
-    model.scene.scale.set(260, 220, 260);
-    model.scene.position.set(-80, 50, 200);
-  },
-  undefined,
-  function (error) {
-    console.error(error);
-  }
-);
-
-// 4. Ánh sáng ----------------------------------------------------------------------
-// Ánh sáng đèn huỳnh quang
-const pLight1 = new THREE.PointLight(0xffffff, 10000, 1000);
-pLight1.position.set(-80, 225, 0);
-scene.add(pLight1);
-const pLight2 = new THREE.PointLight(0xffffff, 10000, 1000);
-pLight2.position.set(-10, 225, 0);
-scene.add(pLight2);
-const pLight3 = new THREE.PointLight(0xffffff, 10000, 1000);
-pLight3.position.set(-150, 225, 0);
-scene.add(pLight3);
-
-// 5. Animate ---------------------------------------------------------------------------
-function animate() {
-  // console.log(camera.position); // in vị trí của camera trong console
+  // 7. Vòng lặp Animate------------------------------------------------------------------------
+  function animate() {
+      // console.log(camera.position); // in vị trí của camera trong console
   // console.log(    "Góc quay chiều ngang: " + controls.getAzimuthalAngle() * (180 / Math.PI));
   console.log("Góc quay chiều dọc: " + controls.getPolarAngle() * (180 / Math.PI));
   console.log("Khoảng cách từ camera đến target: " + controls.getDistance());
-  controls.update();
-  renderer.render(scene, camera);
+  
+    controls.update();
+    renderer.render(scene, camera);
 }
 
-// 6. Other stuff ---------------------------------------------------------------------------
-const axesHelper = new THREE.AxesHelper(500);
-scene.add(axesHelper);
-// Màu đỏ -> x; Màu xanh nước biển -> z; Màu xanh lá -> y
+
+  // 8. Other stuff ---------------------------------------------------------------------------
+  const axesHelper = new THREE.AxesHelper(500);
+  scene.add(axesHelper);
