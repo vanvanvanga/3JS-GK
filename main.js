@@ -265,11 +265,11 @@ let isTvOn = false;
   scene.add( directionalLight );
   const spotLight = new THREE.SpotLight( 0x99FFFF, 50000); // Màu xanh dương
   spotLight.position.set(-80, 125, 210);
-  spotLight.angle = Math.PI / 6.25;
+  spotLight.angle = Math.PI / 6.25; // Góc rộng của ánh sáng
   spotLight.distance = 500;
   scene.add( spotLight );
   spotLight.intensity = 0;
-  const targetObject = new THREE.Object3D();
+  const targetObject = new THREE.Object3D(); // Hướng ánh sáng tới
   scene.add(targetObject);
   targetObject.position.set (-100, 50, -500);
   spotLight.target = targetObject;
