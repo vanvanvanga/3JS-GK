@@ -37,14 +37,15 @@ const loader = new GLTFLoader();
 
 // 4.0. Con ruồi: --------------------------------------------------------------------------
 // a. Ruồi 0 - Ruồi ở đĩa thức ăn
-let fly0;
+let fly0, fly0_sPos;
 loader.load(
   "/model/GK-fly.glb",
   function (model) {
     fly0 = model.scene;
     scene.add(fly0);
     fly0.scale.set(0.01, 0.01, 0.01);
-    fly0.position.y = 150;
+    fly0_sPos = {x: -150, y: 70, z: -75};
+    fly0.position.set(fly0_sPos.x, fly0_sPos.y, fly0_sPos.z);
   },
   undefined,
   function (error) {
@@ -52,9 +53,55 @@ loader.load(
   }
 );
 
+// gia toc goc beta lmao
+let r = 20, angle = 0, beta = 0.1, fly0_path = (angle) => {
+  return {
+    x: fly0_sPos.x + r * Math.cos(angle),
+    y: fly0_sPos.y + 5 * Math.sin(angle), // làm sao để ruồi nhấp nhô
+    z: fly0_sPos.z + r * Math.sin(angle)
+  }
+};
+// fly0Animation runs again everytime animate is looped so r and angle must be global
 function fly0Animation() {
   if (fly0) {
-    fly0.position.x += 0.01;
+    let cPos = fly0_path(angle), nPos = fly0_path(angle + beta);
+    fly0.position.set(cPos.x, cPos.y, cPos.z);
+    fly0.lookAt(nPos.x, nPos.y, nPos.z);
+    angle += beta;
+  }
+}
+
+// b. Ruồi 2 - gần đĩa thức ăn - bay hình số 8
+let fly1, fly1_sPos;
+loader.load(
+  "/model/GK-fly.glb",
+  function (model) {
+    fly1 = model.scene;
+    scene.add(fly1);
+    fly1.scale.set(0.01, 0.01, 0.01);
+    fly1_sPos = {x: fly0_sPos.x, y: fly0_sPos.y, z: fly0_sPos.z};
+    fly1.position.set(fly1_sPos.x, fly1_sPos.y, fly1_sPos.z);
+  },
+  undefined,
+  function (error) {
+    console.error(error);
+  }
+);
+
+let t = 0, delta = 0.1, a = 25, fly1_path = (t) => {
+  return {
+    x: fly1_sPos.x + a * Math.cos(t)/(1 + (Math.sin(t)) ** 2),
+    y: fly1_sPos.y,
+    z: fly1_sPos.z + a * Math.cos(t) * Math.sin(t)/(1 + (Math.sin(t)) ** 2)
+  }
+};
+
+function fly1Animation() {
+  if (fly1) {
+    let cPos = fly1_path(t), nPos = fly1_path(t + delta);
+    fly1.position.set(cPos.x, cPos.y, cPos.z);
+    fly1.lookAt(nPos.x, nPos.y, nPos.z);
+    t += delta;
   }
 }
 
@@ -369,6 +416,7 @@ function animate() {
   // console.log("Khoảng cách từ camera đến target: " + controls.getDistance());
   controls.target.clamp(min, max); //(3)
   fly0Animation();
+  fly1Animation();
   controls.update();
   renderer.render(scene, camera);
 }
