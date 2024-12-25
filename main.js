@@ -511,7 +511,7 @@ const directionalLight = new THREE.DirectionalLight( 0xFFFF99, 0 ); // Màu vàn
 
 // 7. Vòng lặp Animate------------------------------------------------------------------------
 let min = new THREE.Vector3(-150, 5, -100); // (1)
-let max = new THREE.Vector3(200, 100, 80); // (2)
+let max = new THREE.Vector3(400, 100, 80); // (2)
 
 function animate() {
   console.log("Tọa độ camera: " + camera.position.toArray()); // in vị trí của camera trong console
