@@ -2,7 +2,8 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { gsap } from 'gsap';
+import { gsap } from "gsap";
+import { PositionalAudioHelper } from 'three/addons/helpers/PositionalAudioHelper.js';
 
 // 1. Create Scene, Camera, Renderer -------------------------------------------------------------
 const scene = new THREE.Scene();
@@ -29,6 +30,34 @@ controls.minAzimuthAngle = -170 * (Math.PI / 180);
 controls.maxAzimuthAngle = -90 * (Math.PI / 180);
 controls.maxDistance = 470;
 
+// 2. Âm thanh ----------------------------------------------------------------------------------
+// Thiết lập âm thanh
+const listener = new THREE.AudioListener();
+camera.add(listener);
+
+const sound = new THREE.Audio(listener);
+const sound2 = new THREE.Audio(listener);
+
+// Tải âm thanh 1
+const audioLoader = new THREE.AudioLoader();
+audioLoader.load('/music/fly.mp3', function(buffer) {
+    sound.setBuffer(buffer);
+    sound.setLoop(true);
+    sound.setVolume(0.5);
+    sound.play();
+});
+
+// Tải âm thanh 2
+const audioLoader1 = new THREE.AudioLoader();
+audioLoader1.load('/music/ve.mp3', function(buffer) {
+    sound2.setBuffer(buffer);
+    sound2.setLoop(true);
+    sound2.setVolume(0.5);
+    sound2.play();
+});
+
+// Positional audio
+
 // 3. Background setup---------------------------------------------------------------------------
 scene.background = new THREE.Color(0xffffff); // Background màu trắng
 
@@ -44,8 +73,9 @@ loader.load(
     fly0 = model.scene;
     scene.add(fly0);
     fly0.scale.set(0.01, 0.01, 0.01);
-    fly0_sPos = {x: -150, y: 70, z: -75};
+    fly0_sPos = { x: -150, y: 70, z: -75 };
     fly0.position.set(fly0_sPos.x, fly0_sPos.y, fly0_sPos.z);
+    // fly0.add(sound);
   },
   undefined,
   function (error) {
@@ -54,17 +84,21 @@ loader.load(
 );
 
 // gia toc goc beta lmao
-let r = 20, angle = 0, beta = 0.1, fly0_path = (angle) => {
-  return {
-    x: fly0_sPos.x + r * Math.cos(angle),
-    y: fly0_sPos.y + 5 * Math.sin(angle), // làm sao để ruồi nhấp nhô
-    z: fly0_sPos.z + r * Math.sin(angle)
-  }
-};
+let r = 20,
+  angle = 0,
+  beta = 0.1,
+  fly0_path = (angle) => {
+    return {
+      x: fly0_sPos.x + r * Math.cos(angle),
+      y: fly0_sPos.y + 5 * Math.sin(angle), // làm sao để ruồi nhấp nhô
+      z: fly0_sPos.z + r * Math.sin(angle),
+    };
+  };
 // fly0Animation runs again everytime animate is looped so r and angle must be global
 function fly0Animation() {
   if (fly0) {
-    let cPos = fly0_path(angle), nPos = fly0_path(angle + beta);
+    let cPos = fly0_path(angle),
+      nPos = fly0_path(angle + beta);
     fly0.position.set(cPos.x, cPos.y, cPos.z);
     fly0.lookAt(nPos.x, nPos.y, nPos.z);
     angle += beta;
@@ -79,7 +113,7 @@ loader.load(
     fly1 = model.scene;
     scene.add(fly1);
     fly1.scale.set(0.01, 0.01, 0.01);
-    fly1_sPos = {x: fly0_sPos.x, y: fly0_sPos.y, z: fly0_sPos.z};
+    fly1_sPos = { x: fly0_sPos.x, y: fly0_sPos.y, z: fly0_sPos.z };
     fly1.position.set(fly1_sPos.x, fly1_sPos.y, fly1_sPos.z);
   },
   undefined,
@@ -88,17 +122,21 @@ loader.load(
   }
 );
 
-let t = 0, delta = 0.1, a = 25, fly1_path = (t) => {
-  return {
-    x: fly1_sPos.x + a * Math.cos(t)/(1 + (Math.sin(t)) ** 2),
-    y: fly1_sPos.y,
-    z: fly1_sPos.z + a * Math.cos(t) * Math.sin(t)/(1 + (Math.sin(t)) ** 2)
-  }
-};
+let t = 0,
+  delta = 0.1,
+  a = 25,
+  fly1_path = (t) => {
+    return {
+      x: fly1_sPos.x + (a * Math.cos(t)) / (1 + Math.sin(t) ** 2),
+      y: fly1_sPos.y,
+      z: fly1_sPos.z + (a * Math.cos(t) * Math.sin(t)) / (1 + Math.sin(t) ** 2),
+    };
+  };
 
 function fly1Animation() {
   if (fly1) {
-    let cPos = fly1_path(t), nPos = fly1_path(t + delta);
+    let cPos = fly1_path(t),
+      nPos = fly1_path(t + delta);
     fly1.position.set(cPos.x, cPos.y, cPos.z);
     fly1.lookAt(nPos.x, nPos.y, nPos.z);
     t += delta;
@@ -113,7 +151,11 @@ loader.load(
     fly2 = model.scene;
     scene.add(fly2);
     fly2.scale.set(0.01, 0.01, 0.01);
-    fly2_sPos = {x: camera.position.x, y: camera.position.y - 10, z: camera.position.z + 20};
+    fly2_sPos = {
+      x: camera.position.x,
+      y: camera.position.y - 10,
+      z: camera.position.z + 20,
+    };
     fly2.position.set(fly2_sPos.x, fly2_sPos.y, fly2_sPos.z);
   },
   undefined,
@@ -122,18 +164,22 @@ loader.load(
   }
 );
 
-let a2 = 15, k2 = 0.75, angle2 = 0, delta2 = 0.25;
+let a2 = 15,
+  k2 = 0.75,
+  angle2 = 0,
+  delta2 = 0.25;
 let fly2_path = (angle2) => {
   return {
-    x: fly2_sPos.x + a2 * Math.cos(k2*angle2) * Math.cos(angle2),
+    x: fly2_sPos.x + a2 * Math.cos(k2 * angle2) * Math.cos(angle2),
     y: fly2_sPos.y,
-    z: fly2_sPos.z + a2 * Math.cos(k2*angle2) * Math.sin(angle2)
-  }
+    z: fly2_sPos.z + a2 * Math.cos(k2 * angle2) * Math.sin(angle2),
+  };
 };
 
 function fly2Animation() {
   if (fly2) {
-    let cPos = fly2_path(angle4), nPos = fly2_path(angle2 + delta2);
+    let cPos = fly2_path(angle4),
+      nPos = fly2_path(angle2 + delta2);
     fly2.position.set(cPos.x, cPos.y, cPos.z);
     fly2.lookAt(nPos.x, nPos.y, nPos.z);
     angle2 += delta2;
@@ -148,7 +194,11 @@ loader.load(
     fly3 = model.scene;
     scene.add(fly3);
     fly3.scale.set(0.01, 0.01, 0.01);
-    fly3_sPos = {x: camera.position.x, y: camera.position.y - 5, z: camera.position.z + 20};
+    fly3_sPos = {
+      x: camera.position.x,
+      y: camera.position.y - 5,
+      z: camera.position.z + 20,
+    };
     fly3.position.set(fly3_sPos.x, fly3_sPos.y, fly3_sPos.z);
   },
   undefined,
@@ -157,17 +207,23 @@ loader.load(
   }
 );
 
-let t3 = 0, delta3 = 0.1, a3 = 25, fly3_path = (t3) => {
-  return {
-    x: fly3_sPos.x + a3 * Math.cos(t3)/(1 + (Math.sin(t3)) ** 2),
-    y: fly3_sPos.y,
-    z: fly3_sPos.z + a3 * Math.cos(t3) * Math.sin(t3)/(1 + (Math.sin(t3)) ** 2)
-  }
-};
+let t3 = 0,
+  delta3 = 0.1,
+  a3 = 25,
+  fly3_path = (t3) => {
+    return {
+      x: fly3_sPos.x + (a3 * Math.cos(t3)) / (1 + Math.sin(t3) ** 2),
+      y: fly3_sPos.y,
+      z:
+        fly3_sPos.z +
+        (a3 * Math.cos(t3) * Math.sin(t3)) / (1 + Math.sin(t3) ** 2),
+    };
+  };
 
 function fly3Animation() {
   if (fly3) {
-    let cPos = fly3_path(t3), nPos = fly3_path(t3 + delta3);
+    let cPos = fly3_path(t3),
+      nPos = fly3_path(t3 + delta3);
     fly3.position.set(cPos.x, cPos.y, cPos.z);
     fly3.lookAt(nPos.x, nPos.y, nPos.z);
     t3 += delta;
@@ -182,7 +238,11 @@ loader.load(
     fly4 = model.scene;
     scene.add(fly4);
     fly4.scale.set(0.01, 0.01, 0.01);
-    fly4_sPos = {x: camera.position.x, y: camera.position.y - 20, z: camera.position.z + 20};
+    fly4_sPos = {
+      x: camera.position.x,
+      y: camera.position.y - 20,
+      z: camera.position.z + 20,
+    };
     fly4.position.set(fly4_sPos.x, fly4_sPos.y, fly4_sPos.z);
   },
   undefined,
@@ -191,18 +251,22 @@ loader.load(
   }
 );
 
-let a4 = 20, k4 = 1.5, angle4 = 0, delta4 = 0.2;
+let a4 = 20,
+  k4 = 1.5,
+  angle4 = 0,
+  delta4 = 0.2;
 let fly4_path = (angle4) => {
   return {
-    x: fly4_sPos.x + a4 * Math.cos(k4*angle4) * Math.cos(angle4),
+    x: fly4_sPos.x + a4 * Math.cos(k4 * angle4) * Math.cos(angle4),
     y: fly4_sPos.y,
-    z: fly4_sPos.z + a4 * Math.cos(k4*angle4) * Math.sin(angle4)
-  }
+    z: fly4_sPos.z + a4 * Math.cos(k4 * angle4) * Math.sin(angle4),
+  };
 };
 
 function fly4Animation() {
   if (fly4) {
-    let cPos = fly4_path(angle4), nPos = fly4_path(angle4 + delta4);
+    let cPos = fly4_path(angle4),
+      nPos = fly4_path(angle4 + delta4);
     fly4.position.set(cPos.x, cPos.y, cPos.z);
     fly4.lookAt(nPos.x, nPos.y, nPos.z);
     angle4 += delta4;
@@ -320,161 +384,163 @@ cube.scale.set(50, 100, 100);
 
 // 5. Rèm cửa + Op2
 // 5.1. Rèm cửa
-const curtainTexture = new THREE.TextureLoader().load('/textures/curtain.png');
+const curtainTexture = new THREE.TextureLoader().load("/textures/curtain.png");
 const txtRem = new THREE.MeshStandardMaterial({ map: curtainTexture });
 const curtainGeometry = new THREE.BoxGeometry(0.01, 20, 12);
-const curtainLeft = new THREE.Mesh(curtainGeometry, txtRem); 
+const curtainLeft = new THREE.Mesh(curtainGeometry, txtRem);
 const curtainRight = curtainLeft.clone();
 curtainLeft.receiveShadow = true;
 curtainRight.receiveShadow = true;
-scene.add ( curtainRight );
-scene.add ( curtainLeft );
- 
+scene.add(curtainRight);
+scene.add(curtainLeft);
+
 // 5.2. Thanh treo rèm
-const curtainRodTexture = new THREE.TextureLoader().load('/textures/curtainRod.png');
+const curtainRodTexture = new THREE.TextureLoader().load(
+  "/textures/curtainRod.png"
+);
 const txtThanhTreo = new THREE.MeshStandardMaterial({ map: curtainRodTexture });
-const geometry = new THREE.CylinderGeometry( 0.5, 0.5, 30, 100 ); 
-const cylinder = new THREE.Mesh( geometry, txtThanhTreo ); 
+const geometry = new THREE.CylinderGeometry(0.5, 0.5, 30, 100);
+const cylinder = new THREE.Mesh(geometry, txtThanhTreo);
 cylinder.rotation.x = Math.PI / 2;
 cylinder.receiveShadow = true;
-scene.add( cylinder );
+scene.add(cylinder);
 
 // 5.3 Resize lại rèm cửa
-curtainLeft.scale.set (15, 15, 16);
-curtainRight.scale.set (15, 15, 16);
-cylinder.scale.set (13, 13, 13);
+curtainLeft.scale.set(15, 15, 16);
+curtainRight.scale.set(15, 15, 16);
+cylinder.scale.set(13, 13, 13);
 
 // 5.4. Đặt vị trí rèm cửa
-cylinder.position.set (310, 230, -30);
-curtainLeft.position.set (310, 75, -125);
-curtainRight.position.set (310, 75, 65);
+cylinder.position.set(310, 230, -30);
+curtainLeft.position.set(310, 75, -125);
+curtainRight.position.set(310, 75, 65);
 
 // 5.5. Đóng mở rèm cửa
-let isCurtainOpen = true; 
+let isCurtainOpen = true;
 function toggleCurtain() {
-    if (isCurtainOpen) {
-        gsap.to(curtainLeft.scale, { z: 5, duration: 1 });
-        gsap.to(curtainLeft.position, { z: -190, duration: 1 }); 
-        gsap.to(curtainRight.scale, { z: 5, duration: 1 });
-        gsap.to(curtainRight.position, { z: 130, duration: 1 }); 
-        gsap.to(directionalLight, {intensity: 1, duration: 1});
-    } else {
-        gsap.to(curtainLeft.scale, { z: 16, duration: 1 });
-        gsap.to(curtainLeft.position, { z: -125, duration: 1 }); 
-        gsap.to(curtainRight.scale, { z: 16, duration: 1 });
-        gsap.to(curtainRight.position, { z: 65, duration: 1 });
-        gsap.to(directionalLight, {intensity: 0, duration: 1});
-    }
-    isCurtainOpen = !isCurtainOpen;
+  if (isCurtainOpen) {
+    gsap.to(curtainLeft.scale, { z: 5, duration: 1 });
+    gsap.to(curtainLeft.position, { z: -190, duration: 1 });
+    gsap.to(curtainRight.scale, { z: 5, duration: 1 });
+    gsap.to(curtainRight.position, { z: 130, duration: 1 });
+    gsap.to(directionalLight, { intensity: 1, duration: 1 });
+  } else {
+    gsap.to(curtainLeft.scale, { z: 16, duration: 1 });
+    gsap.to(curtainLeft.position, { z: -125, duration: 1 });
+    gsap.to(curtainRight.scale, { z: 16, duration: 1 });
+    gsap.to(curtainRight.position, { z: 65, duration: 1 });
+    gsap.to(directionalLight, { intensity: 0, duration: 1 });
+  }
+  isCurtainOpen = !isCurtainOpen;
 }
-document.getElementById('toggle-curtain').addEventListener('click', toggleCurtain);
+document
+  .getElementById("toggle-curtain")
+  .addEventListener("click", toggleCurtain);
 
 // 6. TV + Option 1:---------------------------------------------------------------------------
-new GLTFLoader().load('/model/GK-tv.glb',
-    function (tv) {
-        scene.add(tv.scene);
-        tv.scene.position.set(-80, 50, 200);
-        tv.scene.rotation.set(0, -3.14, 0);
-        tv.scene.scale.set(260, 220, 260);
+new GLTFLoader().load("/model/GK-tv.glb", function (tv) {
+  scene.add(tv.scene);
+  tv.scene.position.set(-80, 50, 200);
+  tv.scene.rotation.set(0, -3.14, 0);
+  tv.scene.scale.set(260, 220, 260);
 
-        tv.scene.traverse(function (child) {
-            if (child.isMesh && child.name === 'TV1_Screen_0') {
-                tvScreenMesh = child;
-                tvScreenMesh.material = new THREE.MeshBasicMaterial({ map: blackTexture });
-            }
-        });
+  tv.scene.traverse(function (child) {
+    if (child.isMesh && child.name === "TV1_Screen_0") {
+      tvScreenMesh = child;
+      tvScreenMesh.material = new THREE.MeshBasicMaterial({
+        map: blackTexture,
+      });
     }
-);
-
+  });
+});
 
 // 6.1. Video và Texture---------------------------------------------------------------------------
-const video = document.getElementById('tv-video');
+const video = document.getElementById("tv-video");
 video.muted = false;
 video.volume = 1.0;
 video.pause();
 video.currentTime = 0; // Đặt lại thời gian phát về đầu
 const videoTexture = new THREE.VideoTexture(video);
-const blackTexture = new THREE.TextureLoader().load('black.png'); // placeholder to help with toggling tv on/off
+const blackTexture = new THREE.TextureLoader().load("black.png"); // placeholder to help with toggling tv on/off
 let tvScreenMesh = null;
 let isTvOn = false;
 
 // 6.2. Đổi kênh---------------------------------------------------------------------------
 const channels = [
-    './video/channel1.mp4',
-    './video/channel2.mp4',
-    './video/channel3.mp4'
+  "./video/channel1.mp4",
+  "./video/channel2.mp4",
+  "./video/channel3.mp4",
 ];
 let currentChannel = 0;
 function changeChannel() {
-    if (isTvOn) {
-        currentChannel = (currentChannel + 1) % channels.length;
-        video.src = channels[currentChannel];
-        video.play();
-    }
+  if (isTvOn) {
+    currentChannel = (currentChannel + 1) % channels.length;
+    video.src = channels[currentChannel];
+    video.play();
+  }
 }
-
 
 // 6.3. Bật/Tắt màn hình TV và ánh sáng---------------------------------------------------------------------------
 function toggleTvAndSpotLight() {
-if (tvScreenMesh) {
+  if (tvScreenMesh) {
     // Đảo trạng thái của TV
     isTvOn = !isTvOn;
 
     if (isTvOn) {
-        // Khi bật TV
-        tvScreenMesh.material.map = videoTexture; // Hiển thị video
-        video.play(); // Phát video
-        spotLight.intensity = 75000; // Bật ánh sáng
+      // Khi bật TV
+      tvScreenMesh.material.map = videoTexture; // Hiển thị video
+      video.play(); // Phát video
+      spotLight.intensity = 75000; // Bật ánh sáng
     } else {
-        // Khi tắt TV
-        tvScreenMesh.material.map = blackTexture; // Hiển thị màn hình đen
-        video.pause(); // Tạm dừng video
-        spotLight.intensity = 0; // Tắt ánh sáng
+      // Khi tắt TV
+      tvScreenMesh.material.map = blackTexture; // Hiển thị màn hình đen
+      video.pause(); // Tạm dừng video
+      spotLight.intensity = 0; // Tắt ánh sáng
     }
+  }
 }
-}
-
 
 // 6.4. Đảm bảo phát âm thanh sau tương tác---------------------------------------------------------------------------
 function enableAudioPlayback() {
-video.play().then(() => {
-    console.log('Video playback started with sound');
-}).catch((error) => {
-    console.error('Error enabling audio playback:', error);
-});
-// 6.5. Đảm bảo video không phát khi gắn vào texture---------------------------------------------------------------------------
-video.addEventListener('play', () => {
-  if (!isTvOn) {
+  video
+    .play()
+    .then(() => {
+      console.log("Video playback started with sound");
+    })
+    .catch((error) => {
+      console.error("Error enabling audio playback:", error);
+    });
+  // 6.5. Đảm bảo video không phát khi gắn vào texture---------------------------------------------------------------------------
+  video.addEventListener("play", () => {
+    if (!isTvOn) {
       video.pause(); // Dừng phát nếu TV chưa bật
-  }
-});
+    }
+  });
 
-// 6.6. Xóa sự kiện sau khi kích hoạt âm thanh---------------------------------------------------------------------------
-window.removeEventListener('click', enableAudioPlayback);
-window.removeEventListener('keydown', enableAudioPlayback);
+  // 6.6. Xóa sự kiện sau khi kích hoạt âm thanh---------------------------------------------------------------------------
+  window.removeEventListener("click", enableAudioPlayback);
+  window.removeEventListener("keydown", enableAudioPlayback);
 }
 
 // 6.7. Gắn sự kiện phát âm thanh---------------------------------------------------------------------------
-window.addEventListener('click', enableAudioPlayback);
-window.addEventListener('keydown', enableAudioPlayback);
+window.addEventListener("click", enableAudioPlayback);
+window.addEventListener("keydown", enableAudioPlayback);
 
 // 6.8. Gắn sự kiện vào nút HTML---------------------------------------------------------------------------
-const button = document.getElementById('toggle-tv-and-spotlight');
-button.addEventListener('click', toggleTvAndSpotLight);
-
-
+const button = document.getElementById("toggle-tv-and-spotlight");
+button.addEventListener("click", toggleTvAndSpotLight);
 
 // 6.9. Space để đổi kênh---------------------------------------------------------------------------
-window.addEventListener('keydown', (event) => {
-    if (event.code === 'Space') {
-        changeChannel();
-    }
- });
+window.addEventListener("keydown", (event) => {
+  if (event.code === "Space") {
+    changeChannel();
+  }
+});
 
 //7. Ánh sáng---------------------------------------------------------------------------
 // 7.1. Ánh sáng môi trường
 const light = new THREE.AmbientLight(0xffffff); // soft white light
-scene.add(light);
+// scene.add(light);
 
 // 7.2. Ánh sáng đèn HQ
 const pLight1 = new THREE.PointLight(0xffffff, 10000, 1000);
@@ -504,20 +570,18 @@ spotLight.target = targetObject; // Gán target cho ánh sáng
 spotLight.target.updateMatrixWorld(); // Cập nhật lại vị trí target
 
 // 6.4. Ánh sáng mặt trời
-const directionalLight = new THREE.DirectionalLight( 0xFFFF99, 0 ); // Màu vàng
-  directionalLight.castShadow = true;
-  directionalLight.position.set (10000, 10000, 10000);
-  scene.add( directionalLight );
+const directionalLight = new THREE.DirectionalLight(0xffff99, 0); // Màu vàng
+directionalLight.castShadow = true;
+directionalLight.position.set(10000, 10000, 10000);
+scene.add(directionalLight);
+
+
 
 // 7. Vòng lặp Animate------------------------------------------------------------------------
 let min = new THREE.Vector3(-150, 5, -100); // (1)
 let max = new THREE.Vector3(400, 100, 80); // (2)
 
 function animate() {
-  console.log("Tọa độ camera: " + camera.position.toArray()); // in vị trí của camera trong console
-  // console.log("Góc quay chiều ngang: " + controls.getAzimuthalAngle() * (180 / Math.PI));
-  // console.log("Góc quay chiều dọc: " + controls.getPolarAngle() * (180 / Math.PI));
-  // console.log("Khoảng cách từ camera đến target: " + controls.getDistance());
   controls.target.clamp(min, max); //(3)
   fly0Animation();
   fly1Animation();
