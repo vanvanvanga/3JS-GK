@@ -105,6 +105,110 @@ function fly1Animation() {
   }
 }
 
+// a. Ruồi c - gần camera
+let fly2, fly2_sPos;
+loader.load(
+  "/model/GK-fly.glb",
+  function (model) {
+    fly2 = model.scene;
+    scene.add(fly2);
+    fly2.scale.set(0.01, 0.01, 0.01);
+    fly2_sPos = {x: camera.position.x, y: camera.position.y - 10, z: camera.position.z + 20};
+    fly2.position.set(fly2_sPos.x, fly2_sPos.y, fly2_sPos.z);
+  },
+  undefined,
+  function (error) {
+    console.error(error);
+  }
+);
+
+let a2 = 15, k2 = 0.75, angle2 = 0, delta2 = 0.25;
+let fly2_path = (angle2) => {
+  return {
+    x: fly2_sPos.x + a2 * Math.cos(k2*angle2) * Math.cos(angle2),
+    y: fly2_sPos.y,
+    z: fly2_sPos.z + a2 * Math.cos(k2*angle2) * Math.sin(angle2)
+  }
+};
+
+function fly2Animation() {
+  if (fly2) {
+    let cPos = fly2_path(angle4), nPos = fly2_path(angle2 + delta2);
+    fly2.position.set(cPos.x, cPos.y, cPos.z);
+    fly2.lookAt(nPos.x, nPos.y, nPos.z);
+    angle2 += delta2;
+  }
+}
+
+// b. Ruồi 3 - gần camera
+let fly3, fly3_sPos;
+loader.load(
+  "/model/GK-fly.glb",
+  function (model) {
+    fly3 = model.scene;
+    scene.add(fly3);
+    fly3.scale.set(0.01, 0.01, 0.01);
+    fly3_sPos = {x: camera.position.x, y: camera.position.y - 5, z: camera.position.z + 20};
+    fly3.position.set(fly3_sPos.x, fly3_sPos.y, fly3_sPos.z);
+  },
+  undefined,
+  function (error) {
+    console.error(error);
+  }
+);
+
+let t3 = 0, delta3 = 0.1, a3 = 25, fly3_path = (t3) => {
+  return {
+    x: fly3_sPos.x + a3 * Math.cos(t3)/(1 + (Math.sin(t3)) ** 2),
+    y: fly3_sPos.y,
+    z: fly3_sPos.z + a3 * Math.cos(t3) * Math.sin(t3)/(1 + (Math.sin(t3)) ** 2)
+  }
+};
+
+function fly3Animation() {
+  if (fly3) {
+    let cPos = fly3_path(t3), nPos = fly3_path(t3 + delta3);
+    fly3.position.set(cPos.x, cPos.y, cPos.z);
+    fly3.lookAt(nPos.x, nPos.y, nPos.z);
+    t3 += delta;
+  }
+}
+
+// e. Ruồi 4 - gần camera
+let fly4, fly4_sPos;
+loader.load(
+  "/model/GK-fly.glb",
+  function (model) {
+    fly4 = model.scene;
+    scene.add(fly4);
+    fly4.scale.set(0.01, 0.01, 0.01);
+    fly4_sPos = {x: camera.position.x, y: camera.position.y - 20, z: camera.position.z + 20};
+    fly4.position.set(fly4_sPos.x, fly4_sPos.y, fly4_sPos.z);
+  },
+  undefined,
+  function (error) {
+    console.error(error);
+  }
+);
+
+let a4 = 20, k4 = 1.5, angle4 = 0, delta4 = 0.2;
+let fly4_path = (angle4) => {
+  return {
+    x: fly4_sPos.x + a4 * Math.cos(k4*angle4) * Math.cos(angle4),
+    y: fly4_sPos.y,
+    z: fly4_sPos.z + a4 * Math.cos(k4*angle4) * Math.sin(angle4)
+  }
+};
+
+function fly4Animation() {
+  if (fly4) {
+    let cPos = fly4_path(angle4), nPos = fly4_path(angle4 + delta4);
+    fly4.position.set(cPos.x, cPos.y, cPos.z);
+    fly4.lookAt(nPos.x, nPos.y, nPos.z);
+    angle4 += delta4;
+  }
+}
+
 // 4.1. Căn phòng:---------------------------------------------------------------------------
 loader.load(
   "/model/GK-room.glb",
@@ -417,6 +521,9 @@ function animate() {
   controls.target.clamp(min, max); //(3)
   fly0Animation();
   fly1Animation();
+  fly2Animation();
+  fly3Animation();
+  fly4Animation();
   controls.update();
   renderer.render(scene, camera);
 }
