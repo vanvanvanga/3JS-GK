@@ -192,8 +192,8 @@ function toggleCurtain() {
 }
 document.getElementById('toggle-curtain').addEventListener('click', toggleCurtain);
 
-// 6. TV + Opption 1:---------------------------------------------------------------------------
-new GLTFLoader().load('GK-tv.glb',
+// 6. TV + Option 1:---------------------------------------------------------------------------
+new GLTFLoader().load('/model/GK-tv.glb',
     function (tv) {
         scene.add(tv.scene);
         tv.scene.position.set(-80, 50, 200);
