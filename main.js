@@ -21,6 +21,7 @@ renderer.setAnimationLoop(animate);
 document.body.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
+// Giới hạn khả năng xoay/di chuyển của camera
 controls.target.set(-80, 0, 200); // TV
 controls.minPolarAngle = 60 * (Math.PI / 180);
 controls.maxPolarAngle = 88 * (Math.PI / 180);
@@ -145,7 +146,7 @@ cube.scale.set(50, 100, 100);
 
 // 5. Rèm cửa + Op2
 // 5.1. Rèm cửa
-const curtainTexture = new THREE.TextureLoader().load('curtain.png');
+const curtainTexture = new THREE.TextureLoader().load('/textures/curtain.png');
 const txtRem = new THREE.MeshStandardMaterial({ map: curtainTexture });
 const curtainGeometry = new THREE.BoxGeometry(0.01, 20, 12);
 const curtainLeft = new THREE.Mesh(curtainGeometry, txtRem); 
@@ -156,7 +157,7 @@ scene.add ( curtainRight );
 scene.add ( curtainLeft );
  
 // 5.2. Thanh treo rèm
-const curtainRodTexture = new THREE.TextureLoader().load('curtainRod.png');
+const curtainRodTexture = new THREE.TextureLoader().load('/textures/curtainRod.png');
 const txtThanhTreo = new THREE.MeshStandardMaterial({ map: curtainRodTexture });
 const geometry = new THREE.CylinderGeometry( 0.5, 0.5, 30, 100 ); 
 const cylinder = new THREE.Mesh( geometry, txtThanhTreo ); 
@@ -182,11 +183,13 @@ function toggleCurtain() {
         gsap.to(curtainLeft.position, { z: -190, duration: 1 }); 
         gsap.to(curtainRight.scale, { z: 5, duration: 1 });
         gsap.to(curtainRight.position, { z: 130, duration: 1 }); 
+        gsap.to(directionalLight, {intensity: 1, duration: 1});
     } else {
         gsap.to(curtainLeft.scale, { z: 16, duration: 1 });
         gsap.to(curtainLeft.position, { z: -125, duration: 1 }); 
         gsap.to(curtainRight.scale, { z: 16, duration: 1 });
-        gsap.to(curtainRight.position, { z: 65, duration: 1 }); 
+        gsap.to(curtainRight.position, { z: 65, duration: 1 });
+        gsap.to(directionalLight, {intensity: 0, duration: 1});
     }
     isCurtainOpen = !isCurtainOpen;
 }
@@ -319,33 +322,34 @@ spotLight.angle = Math.PI / 6.25;
 spotLight.distance = 500;
 scene.add(spotLight);
 spotLight.intensity = 0;
+
 const targetObject = new THREE.Object3D(); // Tạo đối tượng làm target
 scene.add(targetObject); // Thêm target vào scene
 targetObject.position.set(-100, 50, -500); // Di chuyển target sang phải 1 đơn vị
 spotLight.target = targetObject; // Gán target cho ánh sáng
 spotLight.target.updateMatrixWorld(); // Cập nhật lại vị trí target
-// const spotLightHelper = new THREE.SpotLightHelper( spotLight );
-// scene.add( spotLightHelper );
 
-// //6.4. Ánh sáng mặt trời
-// const directionalLight = new THREE.DirectionalLight( 0xFFFF99, 1 ); // Màu vàng
-//   directionalLight.castShadow = true;
-//   directionalLight.position.set (10000, 10000, 10000);
-//   scene.add( directionalLight );
+// 6.4. Ánh sáng mặt trời
+const directionalLight = new THREE.DirectionalLight( 0xFFFF99, 0 ); // Màu vàng
+  directionalLight.castShadow = true;
+  directionalLight.position.set (10000, 10000, 10000);
+  scene.add( directionalLight );
 
 // 7. Vòng lặp Animate------------------------------------------------------------------------
-let min = new THREE.Vector3(-200, 5, -100);
-let max = new THREE.Vector3(200, 100, 80);
+let min = new THREE.Vector3(-150, 5, -100); // (1)
+let max = new THREE.Vector3(200, 100, 80); // (2)
 
 function animate() {
   console.log("Tọa độ camera: " + camera.position.toArray()); // in vị trí của camera trong console
   // console.log("Góc quay chiều ngang: " + controls.getAzimuthalAngle() * (180 / Math.PI));
   // console.log("Góc quay chiều dọc: " + controls.getPolarAngle() * (180 / Math.PI));
   // console.log("Khoảng cách từ camera đến target: " + controls.getDistance());
-  controls.target.clamp(min, max);
+  controls.target.clamp(min, max); //(3)
   controls.update();
   renderer.render(scene, camera);
 }
+
+// (1-3): Giới hạn chuyển động của camera
 
 // 9. Other stuff ---------------------------------------------------------------------------
 const axesHelper = new THREE.AxesHelper(500);
