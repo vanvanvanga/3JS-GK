@@ -35,6 +35,29 @@ scene.background = new THREE.Color(0xffffff); // Background màu trắng
 // 4. Objects (+ positioning, lighting) ---------------------------------------------------------
 const loader = new GLTFLoader();
 
+// 4.0. Con ruồi: --------------------------------------------------------------------------
+// a. Ruồi 0 - Ruồi ở đĩa thức ăn
+let fly0;
+loader.load(
+  "/model/GK-fly.glb",
+  function (model) {
+    fly0 = model.scene;
+    scene.add(fly0);
+    fly0.scale.set(0.01, 0.01, 0.01);
+    fly0.position.y = 150;
+  },
+  undefined,
+  function (error) {
+    console.error(error);
+  }
+);
+
+function fly0Animation() {
+  if (fly0) {
+    fly0.position.x += 0.01;
+  }
+}
+
 // 4.1. Căn phòng:---------------------------------------------------------------------------
 loader.load(
   "/model/GK-room.glb",
@@ -220,7 +243,7 @@ video.volume = 1.0;
 video.pause();
 video.currentTime = 0; // Đặt lại thời gian phát về đầu
 const videoTexture = new THREE.VideoTexture(video);
-const blackTexture = new THREE.TextureLoader().load('black.png');
+const blackTexture = new THREE.TextureLoader().load('black.png'); // placeholder to help with toggling tv on/off
 let tvScreenMesh = null;
 let isTvOn = false;
 
@@ -345,6 +368,7 @@ function animate() {
   // console.log("Góc quay chiều dọc: " + controls.getPolarAngle() * (180 / Math.PI));
   // console.log("Khoảng cách từ camera đến target: " + controls.getDistance());
   controls.target.clamp(min, max); //(3)
+  fly0Animation();
   controls.update();
   renderer.render(scene, camera);
 }
