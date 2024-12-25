@@ -7,10 +7,7 @@
             <source src="./videos/channel1.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
-    
-        <!-- Nút bật/tắt màn hình TV -->
-        <button id="toggle-tv">ON/OFF</button>
-    
+   
         <!-- Tệp JavaScript chính -->
         <script type="module" src="/main.js"></script>
     </body>
@@ -19,25 +16,34 @@
     <style>
         body { margin: 0; overflow: hidden; }
         video { display: none; } /* Ẩn video trên giao diện */
-        button {
+        #controls {
             position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 100;
+            top: 20px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        button {
             padding: 10px 20px;
-            background-color: #007BFF;
-            color: white;
+            font-size: 16px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
+            background-color: #007bff;
+            color: white;
         }
         button:hover {
-            background-color: #0056b3;
+            background-color: #007bff;
         }
-    </style>
-    <button id="toggle-tv-and-spotlight">ON / OFF</button>
-
+</style>
+</head>
+<body>
+  <div id="controls">
+    <!-- Nút bật/tắt TV -->
+    <button id="toggle-tv-and-spotlight">Bật/Tắt TV</button>
+    <!-- Nút đóng/mở rèm -->
+    <button id="toggle-curtain">Đóng/Mở Rèm Cửa</button>
 
 </head>
 </html>
