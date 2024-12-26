@@ -3,7 +3,6 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { gsap } from "gsap";
-import { PositionalAudioHelper } from 'three/addons/helpers/PositionalAudioHelper.js';
 
 // 1. Create Scene, Camera, Renderer -------------------------------------------------------------
 const scene = new THREE.Scene();
@@ -19,6 +18,8 @@ camera.position.set(-150, 200, -220);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setAnimationLoop(animate);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
 document.body.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -35,31 +36,51 @@ controls.maxDistance = 470;
 const listener = new THREE.AudioListener();
 camera.add(listener);
 
+// Tiếng ruồi:
+
+			const audioElement = document.getElementById( 'music' );
+			audioElement.play();
+
+			const positionalAudio = new THREE.PositionalAudio( listener );
+			positionalAudio.setMediaElementSource( audioElement );
+			positionalAudio.setRefDistance( 10 );
+
+// Tiếng ve:
 const sound = new THREE.Audio(listener);
-const sound2 = new THREE.Audio(listener);
-
-// Tải âm thanh 1
-const audioLoader = new THREE.AudioLoader();
-audioLoader.load('/music/fly.mp3', function(buffer) {
-    sound.setBuffer(buffer);
-    sound.setLoop(true);
-    sound.setVolume(0.5);
-    sound.play();
+new THREE.AudioLoader().load('/music/ve.mp3', function(buffer) {
+  sound.setBuffer(buffer);
+  sound.setLoop(true);
+  sound.setVolume(0.5);
+  sound.play();
 });
 
-// Tải âm thanh 2
-const audioLoader1 = new THREE.AudioLoader();
-audioLoader1.load('/music/ve.mp3', function(buffer) {
-    sound2.setBuffer(buffer);
-    sound2.setLoop(true);
-    sound2.setVolume(0.5);
-    sound2.play();
-});
+// Tiếng ruồi gần camera:
 
-// Positional audio
+const audioElement3 = document.getElementById( 'music3' );
+audioElement3.play();
+
+const positionalAudio3 = new THREE.PositionalAudio( listener );
+positionalAudio3.setMediaElementSource( audioElement3 );
+positionalAudio3.setRefDistance( 100 );
+
+const s3_g = new THREE.BoxGeometry( 1, 1, 1 ); 
+const s3_m = new THREE.MeshBasicMaterial( {color: 0x00ff00, transparent: true, opacity: 0} ); 
+const s3 = new THREE.Mesh( s3_g, s3_m ); 
+scene.add( s3 );
+s3.position.set(-150, 200, -220);
+s3.add(positionalAudio3);
+
+			// const helper = new PositionalAudioHelper( positionalAudio, 10 );
+			// positionalAudio.add( helper );
+
+      // const helper2 = new PositionalAudioHelper( positionalAudio2, 10 );
+			// positionalAudio2.add( helper2 );
+
 
 // 3. Background setup---------------------------------------------------------------------------
-scene.background = new THREE.Color(0xffffff); // Background màu trắng
+scene.background = new THREE.CubeTextureLoader()
+.setPath("/background/")
+.load(["posx.jpg", "negx.jpg", "posy.jpg", "negy.jpg", "posz.jpg", "negz.jpg"]);
 
 // 4. Objects (+ positioning, lighting) ---------------------------------------------------------
 const loader = new GLTFLoader();
@@ -280,6 +301,12 @@ loader.load(
     scene.add(model.scene);
     model.scene.scale.set(2, 1, 2);
     model.scene.position.x = 150;
+    model.scene.traverse(function (child) {
+      if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+      }
+  });
   },
   undefined,
   function (error) {
@@ -294,6 +321,12 @@ loader.load(
     scene.add(model.scene);
     model.scene.scale.set(200, 200, 200);
     model.scene.position.set(-80, 65, -260);
+    model.scene.traverse(function (child) {
+      if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+      }
+  });
   },
   undefined,
   function (error) {
@@ -308,6 +341,13 @@ loader.load(
     scene.add(model.scene);
     model.scene.scale.set(210, 90, 150);
     model.scene.position.set(-80, 0, -60);
+    model.scene.traverse(function (child) {
+      if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+      }
+  });
+  directionalLight.target = model.scene;
   },
   undefined,
   function (error) {
@@ -322,6 +362,13 @@ loader.load(
     scene.add(model.scene);
     model.scene.scale.set(5, 5, 5);
     model.scene.position.set(-150, 58, -75);
+    model.scene.add(positionalAudio);
+    model.scene.traverse(function (child) {
+      if (child.isMesh) {
+          child.castShadow = true;
+          child.receiveShadow = true;
+      }
+  });
   },
   undefined,
   function (error) {
@@ -423,13 +470,15 @@ function toggleCurtain() {
     gsap.to(curtainLeft.position, { z: -190, duration: 1 });
     gsap.to(curtainRight.scale, { z: 5, duration: 1 });
     gsap.to(curtainRight.position, { z: 130, duration: 1 });
-    gsap.to(directionalLight, { intensity: 1, duration: 1 });
+    gsap.to(directionalLight, { intensity: 10, duration: 1 });
+    gsap.to(light, { intensity: 1, duration: 1 });
   } else {
     gsap.to(curtainLeft.scale, { z: 16, duration: 1 });
     gsap.to(curtainLeft.position, { z: -125, duration: 1 });
     gsap.to(curtainRight.scale, { z: 16, duration: 1 });
     gsap.to(curtainRight.position, { z: 65, duration: 1 });
     gsap.to(directionalLight, { intensity: 0, duration: 1 });
+    gsap.to(light, { intensity: 0, duration: 1 });
   }
   isCurtainOpen = !isCurtainOpen;
 }
@@ -467,9 +516,11 @@ let isTvOn = false;
 
 // 6.2. Đổi kênh---------------------------------------------------------------------------
 const channels = [
-  "./video/channel1.mp4",
-  "./video/channel2.mp4",
-  "./video/channel3.mp4",
+  "/videos/channel1.mp4",
+  "/videos/channel2.mp4",
+  "/videos/channel3.mp4",
+  "/videos/channel4.mp4",
+  "/videos/channel5.mp4",
 ];
 let currentChannel = 0;
 function changeChannel() {
@@ -539,8 +590,8 @@ window.addEventListener("keydown", (event) => {
 
 //7. Ánh sáng---------------------------------------------------------------------------
 // 7.1. Ánh sáng môi trường
-const light = new THREE.AmbientLight(0xffffff); // soft white light
-// scene.add(light);
+const light = new THREE.AmbientLight(0xffffff, 0); // soft white light
+scene.add(light);
 
 // 7.2. Ánh sáng đèn HQ
 const pLight1 = new THREE.PointLight(0xffffff, 10000, 1000);
@@ -572,10 +623,14 @@ spotLight.target.updateMatrixWorld(); // Cập nhật lại vị trí target
 // 6.4. Ánh sáng mặt trời
 const directionalLight = new THREE.DirectionalLight(0xffff99, 0); // Màu vàng
 directionalLight.castShadow = true;
-directionalLight.position.set(10000, 10000, 10000);
+directionalLight.shadow.camera.left = -550;
+directionalLight.shadow.camera.right = 550;
+directionalLight.shadow.camera.top = 550;
+directionalLight.shadow.camera.bottom = -550;
+directionalLight.shadow.mapSize.width = 5000;
+directionalLight.shadow.mapSize.height = 5000;
+directionalLight.position.set(0, 1000, 0);
 scene.add(directionalLight);
-
-
 
 // 7. Vòng lặp Animate------------------------------------------------------------------------
 let min = new THREE.Vector3(-150, 5, -100); // (1)
