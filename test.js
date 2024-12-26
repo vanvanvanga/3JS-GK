@@ -12,10 +12,14 @@ document.body.appendChild(renderer.domElement);
 const listener = new THREE.AudioListener();
 camera.add(listener);
 
+scene.background = new THREE.Color(0xfff000);
+
 // Create a sphere geometry and a material
 const geometry = new THREE.SphereGeometry(1, 32, 32);
 const material = new THREE.MeshBasicMaterial({ color: 0x0077ff });
 const sphere = new THREE.Mesh(geometry, material);
+sphere.castShadow = true;
+sphere.receiveShadow = true;
 
 // Add the sphere to the scene
 scene.add(sphere);
@@ -23,23 +27,10 @@ scene.add(sphere);
 // Set the initial position of the sphere
 sphere.position.set(5, 0, 0); // 5 units away on the x-axis
 
-// Create an AudioLoader to load sound
-const audioLoader = new AudioLoader();
-
-// Create positional audio for the sphere
-const sound = new THREE.PositionalAudio(listener);
-
-// Load a sound and attach it to the sphere
-audioLoader.load('/music/fly.mp3', (buffer) => {
-    sound.setBuffer(buffer);
-    sound.setRefDistance(1); // Distance at which the sound starts fading
-    sound.setLoop(true); // Loop the sound
-    sound.setVolume(1); // Set volume (0 to 1)
-    sound.play();
-});
-
-// Attach the positional audio to the sphere
-sphere.add(sound);
+const light = new THREE.DirectionalLight(0xff0000, 100);
+light.castShadow = true;
+light.position.set(8,0,0);
+scene.add(light);
 
 // Set up basic camera controls (move the camera for demonstration)
 camera.position.z = 10;

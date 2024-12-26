@@ -24,14 +24,13 @@ document.body.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 // Giới hạn khả năng xoay/di chuyển của camera
-// controls.target.set(-80, 0, 200); // TV
-// controls.minPolarAngle = 60 * (Math.PI / 180);
-// controls.maxPolarAngle = 88 * (Math.PI / 180);
-// controls.minAzimuthAngle = -170 * (Math.PI / 180);
-// controls.maxAzimuthAngle = -90 * (Math.PI / 180);
-// controls.maxDistance = 470;
+controls.target.set(-80, 0, 200); // TV
+controls.minPolarAngle = 60 * (Math.PI / 180);
+controls.maxPolarAngle = 88 * (Math.PI / 180);
+controls.minAzimuthAngle = -170 * (Math.PI / 180);
+controls.maxAzimuthAngle = -90 * (Math.PI / 180);
+controls.maxDistance = 470;
 
-// 2. Âm thanh ----------------------------------------------------------------------------------
 // Thiết lập âm thanh
 const listener = new THREE.AudioListener();
 camera.add(listener);
@@ -43,38 +42,35 @@ camera.add(listener);
 
 			const positionalAudio = new THREE.PositionalAudio( listener );
 			positionalAudio.setMediaElementSource( audioElement );
-			positionalAudio.setRefDistance( 10 );
-
+			positionalAudio.setRefDistance( 30 );
+      positionalAudio.setVolume(25);
 // Tiếng ve:
 const sound = new THREE.Audio(listener);
+sound.autoplay = true;
 new THREE.AudioLoader().load('/music/ve.mp3', function(buffer) {
   sound.setBuffer(buffer);
   sound.setLoop(true);
   sound.setVolume(0.5);
-  sound.play();
 });
 
-// Tiếng ruồi gần camera:
+
+
+// Tiếng ruồi gần vị trí gốc camera:
 
 const audioElement3 = document.getElementById( 'music3' );
 audioElement3.play();
 
 const positionalAudio3 = new THREE.PositionalAudio( listener );
 positionalAudio3.setMediaElementSource( audioElement3 );
-positionalAudio3.setRefDistance( 100 );
+positionalAudio3.setRefDistance( 30 );
+positionalAudio3.setVolume(25);
 
 const s3_g = new THREE.BoxGeometry( 1, 1, 1 ); 
-const s3_m = new THREE.MeshBasicMaterial( {color: 0x00ff00, transparent: true, opacity: 0} ); 
+const s3_m = new THREE.MeshBasicMaterial( {color: 0x00ff00, transparent: true, opacity: 0} ); // làm cho hộp vô hình
 const s3 = new THREE.Mesh( s3_g, s3_m ); 
 scene.add( s3 );
 s3.position.set(-150, 200, -220);
-s3.add(positionalAudio3);
-
-			// const helper = new PositionalAudioHelper( positionalAudio, 10 );
-			// positionalAudio.add( helper );
-
-      // const helper2 = new PositionalAudioHelper( positionalAudio2, 10 );
-			// positionalAudio2.add( helper2 );
+s3.add(positionalAudio3); // add âm thah vào nguồn
 
 
 // 3. Background setup---------------------------------------------------------------------------
@@ -387,7 +383,7 @@ const den = new THREE.Mesh(hinhTru, txtDen);
 scene.add(den);
 
 // 4.6. Đế:---------------------------------------------------------------------------
-const loadPanelTexture = new THREE.TextureLoader().load("panel.jpg");
+const loadPanelTexture = new THREE.TextureLoader().load("/textures/panel.jpg");
 const txtDe = new THREE.MeshPhongMaterial({ map: loadPanelTexture });
 const hinhHop = new THREE.BoxGeometry(0.45, 10.5, 0.3);
 const de = new THREE.Mesh(hinhHop, txtDe);
@@ -473,7 +469,7 @@ function toggleCurtain() {
     gsap.to(curtainLeft.position, { z: -190, duration: 1 });
     gsap.to(curtainRight.scale, { z: 5, duration: 1 });
     gsap.to(curtainRight.position, { z: 130, duration: 1 });
-    gsap.to(directionalLight, { intensity: 10, duration: 1 });
+    gsap.to(directionalLight, { intensity: 5, duration: 1 });
     gsap.to(light, { intensity: 0.5, duration: 1 });
   } else {
     gsap.to(curtainLeft.scale, { z: 16, duration: 1 });
@@ -497,7 +493,7 @@ new GLTFLoader().load("/model/GK-tv.glb", function (tv) {
   tv.scene.scale.set(260, 220, 260);
 
   tv.scene.traverse(function (child) {
-    if (child.isMesh && child.name === "TV1_Screen_0") {
+    if (child.isMesh) {
       tvScreenMesh = child;
       tvScreenMesh.material = new THREE.MeshBasicMaterial({
         map: blackTexture,
@@ -521,15 +517,16 @@ video.pause();
 video.currentTime = 0; // Đặt lại thời gian phát về đầu
 const videoTexture = new THREE.VideoTexture(video);
 const blackTexture = new THREE.TextureLoader().load("black.png"); // placeholder to help with toggling tv on/off
+videoTexture.repeat.set(1, 1.75); 
 let tvScreenMesh = null;
 let isTvOn = false;
 
 // 6.2. Đổi kênh---------------------------------------------------------------------------
 const channels = [
-  "/videos/channel1.mp4",
+  "/videos/channel4.mp4",
   "/videos/channel2.mp4",
   "/videos/channel3.mp4",
-  "/videos/channel4.mp4",
+  "/videos/channel1.mp4",
   "/videos/channel5.mp4",
 ];
 let currentChannel = 0;
@@ -565,12 +562,8 @@ function toggleTvAndSpotLight() {
 function enableAudioPlayback() {
   video
     .play()
-    .then(() => {
-      console.log("Video playback started with sound");
-    })
-    .catch((error) => {
-      console.error("Error enabling audio playback:", error);
-    });
+    .then()
+    .catch(error) 
   // 6.5. Đảm bảo video không phát khi gắn vào texture---------------------------------------------------------------------------
   video.addEventListener("play", () => {
     if (!isTvOn) {
@@ -618,33 +611,39 @@ pLight3.position.set(-150, 225, 0);
 scene.add(pLight3);
 
 // 7.3. Ánh sáng TV
-const spotLight = new THREE.SpotLight(0x99ffff, 50000);
+const spotLight = new THREE.SpotLight(0x99ffff, 0);
 spotLight.position.set(-80, 125, 210);
 spotLight.angle = Math.PI / 6.25;
 spotLight.distance = 500;
 scene.add(spotLight);
-spotLight.intensity = 0;
 
 const targetObject = new THREE.Object3D(); // Tạo đối tượng làm target
 scene.add(targetObject); // Thêm target vào scene
-targetObject.position.set(-100, 50, -500); // Di chuyển target sang phải 1 đơn vị
+targetObject.position.set(-100, 50, -500);
 spotLight.target = targetObject; // Gán target cho ánh sáng
-spotLight.target.updateMatrixWorld(); // Cập nhật lại vị trí target
 
 // 6.4. Ánh sáng mặt trời
-const directionalLight = new THREE.DirectionalLight(0xffff99, 0); // Màu vàng
+const directionalLight = new THREE.DirectionalLight(0xffdd71, 0); // Màu vàng
 directionalLight.castShadow = true;
-// directionalLight.shadow.camera.left = -550;
-// directionalLight.shadow.camera.right = 550;
-// directionalLight.shadow.camera.top = 550;
-// directionalLight.shadow.camera.bottom = -550;
-// directionalLight.shadow.mapSize.width = 500;
-// directionalLight.shadow.mapSize.height = 500;
-directionalLight.position.set(0, 1000, 0);
+directionalLight.shadow.camera.left = -550;
+directionalLight.shadow.camera.right = 550;
+directionalLight.shadow.camera.top = 550;
+directionalLight.shadow.camera.bottom = -550;
+directionalLight.shadow.mapSize.width = 500;
+directionalLight.shadow.mapSize.height = 500;
+directionalLight.position.set(1000, 1000, 0);
 scene.add(directionalLight);
 
-const helper = new THREE.DirectionalLightHelper( directionalLight, 2000 );
-scene.add( helper );
+// 6.5. Giúp nhận ánh sáng
+const planeGeometry = new THREE.PlaneGeometry( 2000, 2000 );
+				planeGeometry.rotateX( - Math.PI / 2 );
+				const planeMaterial = new THREE.ShadowMaterial( { color: 0x000000, opacity: 0.2 } );
+
+				const plane = new THREE.Mesh( planeGeometry, planeMaterial );
+				plane.position.y = 20;
+				plane.receiveShadow = true;
+				scene.add( plane );
+
 // 7. Vòng lặp Animate------------------------------------------------------------------------
 let min = new THREE.Vector3(-150, 5, -100); // (1)
 let max = new THREE.Vector3(400, 100, 80); // (2)
@@ -657,12 +656,15 @@ function animate() {
   fly3Animation();
   fly4Animation();
   controls.update();
-  renderer.render(scene, camera);
+  renderer.render(scene , camera , targetObject );
 }
 
 // (1-3): Giới hạn chuyển động của camera
 
 // 9. Other stuff ---------------------------------------------------------------------------
-const axesHelper = new THREE.AxesHelper(500);
-scene.add(axesHelper);
+// const axesHelper = new THREE.AxesHelper(500);
+// scene.add(axesHelper);
 // Màu đỏ -> x; Màu xanh nước biển -> z; Màu xanh lá -> y
+
+const helper = new THREE.DirectionalLightHelper( directionalLight, 2000 );
+scene.add( helper );
