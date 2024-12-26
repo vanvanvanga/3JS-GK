@@ -11,7 +11,7 @@ const camera = new THREE.PerspectiveCamera(
   60, // độ mở của camera
   window.innerWidth / window.innerHeight, // tỉ lệ khung hình
   0.1, // khoảng cách gần nhất thấy được
-  1500 // khoảng cách xa nhất thấy được
+  15000 // khoảng cách xa nhất thấy được
 );
 camera.position.set(-150, 200, -220);
 
@@ -24,12 +24,12 @@ document.body.appendChild(renderer.domElement);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 // Giới hạn khả năng xoay/di chuyển của camera
-controls.target.set(-80, 0, 200); // TV
-controls.minPolarAngle = 60 * (Math.PI / 180);
-controls.maxPolarAngle = 88 * (Math.PI / 180);
-controls.minAzimuthAngle = -170 * (Math.PI / 180);
-controls.maxAzimuthAngle = -90 * (Math.PI / 180);
-controls.maxDistance = 470;
+// controls.target.set(-80, 0, 200); // TV
+// controls.minPolarAngle = 60 * (Math.PI / 180);
+// controls.maxPolarAngle = 88 * (Math.PI / 180);
+// controls.minAzimuthAngle = -170 * (Math.PI / 180);
+// controls.maxAzimuthAngle = -90 * (Math.PI / 180);
+// controls.maxDistance = 470;
 
 // 2. Âm thanh ----------------------------------------------------------------------------------
 // Thiết lập âm thanh
@@ -428,6 +428,8 @@ const cube = new THREE.Mesh(boxgeometry, boxmaterial);
 scene.add(cube);
 cube.position.set(-80, 0, 200);
 cube.scale.set(50, 100, 100);
+cube.castShadow = true;
+cube.receiveShadow = true;
 
 // 5. Rèm cửa + Op2
 // 5.1. Rèm cửa
@@ -438,6 +440,8 @@ const curtainLeft = new THREE.Mesh(curtainGeometry, txtRem);
 const curtainRight = curtainLeft.clone();
 curtainLeft.receiveShadow = true;
 curtainRight.receiveShadow = true;
+curtainLeft.castShadow = true;
+curtainRight.castShadow = true;
 scene.add(curtainRight);
 scene.add(curtainLeft);
 
@@ -449,7 +453,6 @@ const txtThanhTreo = new THREE.MeshStandardMaterial({ map: curtainRodTexture });
 const geometry = new THREE.CylinderGeometry(0.5, 0.5, 30, 100);
 const cylinder = new THREE.Mesh(geometry, txtThanhTreo);
 cylinder.rotation.x = Math.PI / 2;
-cylinder.receiveShadow = true;
 scene.add(cylinder);
 
 // 5.3 Resize lại rèm cửa
@@ -471,7 +474,7 @@ function toggleCurtain() {
     gsap.to(curtainRight.scale, { z: 5, duration: 1 });
     gsap.to(curtainRight.position, { z: 130, duration: 1 });
     gsap.to(directionalLight, { intensity: 10, duration: 1 });
-    gsap.to(light, { intensity: 1, duration: 1 });
+    gsap.to(light, { intensity: 0.5, duration: 1 });
   } else {
     gsap.to(curtainLeft.scale, { z: 16, duration: 1 });
     gsap.to(curtainLeft.position, { z: -125, duration: 1 });
@@ -501,6 +504,13 @@ new GLTFLoader().load("/model/GK-tv.glb", function (tv) {
       });
     }
   });
+
+  tv.scene.traverse(function (child) {
+    if (child.isMesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+    }
+});
 });
 
 // 6.1. Video và Texture---------------------------------------------------------------------------
@@ -596,6 +606,7 @@ scene.add(light);
 // 7.2. Ánh sáng đèn HQ
 const pLight1 = new THREE.PointLight(0xffffff, 10000, 1000);
 pLight1.position.set(-80, 225, 0);
+pLight1.castShadow = true;
 scene.add(pLight1);
 
 const pLight2 = pLight1.clone();
@@ -623,15 +634,17 @@ spotLight.target.updateMatrixWorld(); // Cập nhật lại vị trí target
 // 6.4. Ánh sáng mặt trời
 const directionalLight = new THREE.DirectionalLight(0xffff99, 0); // Màu vàng
 directionalLight.castShadow = true;
-directionalLight.shadow.camera.left = -550;
-directionalLight.shadow.camera.right = 550;
-directionalLight.shadow.camera.top = 550;
-directionalLight.shadow.camera.bottom = -550;
-directionalLight.shadow.mapSize.width = 5000;
-directionalLight.shadow.mapSize.height = 5000;
+// directionalLight.shadow.camera.left = -550;
+// directionalLight.shadow.camera.right = 550;
+// directionalLight.shadow.camera.top = 550;
+// directionalLight.shadow.camera.bottom = -550;
+// directionalLight.shadow.mapSize.width = 500;
+// directionalLight.shadow.mapSize.height = 500;
 directionalLight.position.set(0, 1000, 0);
 scene.add(directionalLight);
 
+const helper = new THREE.DirectionalLightHelper( directionalLight, 2000 );
+scene.add( helper );
 // 7. Vòng lặp Animate------------------------------------------------------------------------
 let min = new THREE.Vector3(-150, 5, -100); // (1)
 let max = new THREE.Vector3(400, 100, 80); // (2)
