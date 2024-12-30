@@ -640,9 +640,10 @@ const planeGeometry = new THREE.PlaneGeometry( 2000, 2000 );
 				const planeMaterial = new THREE.ShadowMaterial( { color: 0x000000, opacity: 0.2 } );
 
 				const plane = new THREE.Mesh( planeGeometry, planeMaterial );
-				plane.position.y = 20;
+				plane.position.y = 2;
 				plane.receiveShadow = true;
 				scene.add( plane );
+
 
 // 7. Vòng lặp Animate------------------------------------------------------------------------
 let min = new THREE.Vector3(-150, 5, -100); // (1)
@@ -660,6 +661,12 @@ function animate() {
 }
 
 // (1-3): Giới hạn chuyển động của camera
+
+// 8. Resize window
+window.addEventListener('resize', () => {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+});
 
 // 9. Other stuff ---------------------------------------------------------------------------
 // const axesHelper = new THREE.AxesHelper(500);
