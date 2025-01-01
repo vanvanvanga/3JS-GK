@@ -570,21 +570,12 @@ function enableAudioPlayback() {
       video.pause(); // Dừng phát nếu TV chưa bật
     }
   });
-
-  // 6.6. Xóa sự kiện sau khi kích hoạt âm thanh---------------------------------------------------------------------------
-  window.removeEventListener("click", enableAudioPlayback);
-  window.removeEventListener("keydown", enableAudioPlayback);
 }
-
-// 6.7. Gắn sự kiện phát âm thanh---------------------------------------------------------------------------
-window.addEventListener("click", enableAudioPlayback);
-window.addEventListener("keydown", enableAudioPlayback);
-
-// 6.8. Gắn sự kiện vào nút HTML---------------------------------------------------------------------------
+// 6.6. Gắn event vào nút HTML---------------------------------------------------------------------------
 const button = document.getElementById("toggle-tv-and-spotlight");
 button.addEventListener("click", toggleTvAndSpotLight);
 
-// 6.9. Space để đổi kênh---------------------------------------------------------------------------
+// 6.7. Space để đổi kênh---------------------------------------------------------------------------
 window.addEventListener("keydown", (event) => {
   if (event.code === "Space") {
     changeChannel();
