@@ -582,7 +582,7 @@ window.addEventListener("keydown", enableAudioPlayback);
 const button = document.getElementById("toggle-tv-and-spotlight");
 button.addEventListener("click", toggleTvAndSpotLight);
 
-// 6.9. Space để đổi kênh---------------------------------------------------------------------------
+// 6.7. Space để đổi kênh---------------------------------------------------------------------------
 window.addEventListener("keydown", (event) => {
   if (event.key === "b") {
     changeChannel();
