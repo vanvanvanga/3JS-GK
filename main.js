@@ -563,7 +563,7 @@ function enableAudioPlayback() {
   video
     .play()
     .then()
-    .catch(error) 
+    .catch("error") 
   // 6.5. Đảm bảo video không phát khi gắn vào texture---------------------------------------------------------------------------
   video.addEventListener("play", () => {
     if (!isTvOn) {
@@ -571,13 +571,11 @@ function enableAudioPlayback() {
     }
   });
 
-  // 6.6. Xóa sự kiện sau khi kích hoạt âm thanh---------------------------------------------------------------------------
-  window.removeEventListener("click", enableAudioPlayback);
+   // 6.6. Xóa sự kiện sau khi kích hoạt âm thanh---------------------------------------------------------------------------
   window.removeEventListener("keydown", enableAudioPlayback);
 }
 
 // 6.7. Gắn sự kiện phát âm thanh---------------------------------------------------------------------------
-window.addEventListener("click", enableAudioPlayback);
 window.addEventListener("keydown", enableAudioPlayback);
 
 // 6.8. Gắn sự kiện vào nút HTML---------------------------------------------------------------------------
@@ -586,7 +584,7 @@ button.addEventListener("click", toggleTvAndSpotLight);
 
 // 6.9. Space để đổi kênh---------------------------------------------------------------------------
 window.addEventListener("keydown", (event) => {
-  if (event.code === "Space") {
+  if (event.key === "b") {
     changeChannel();
   }
 });
@@ -673,5 +671,5 @@ window.addEventListener('resize', () => {
 // scene.add(axesHelper);
 // Màu đỏ -> x; Màu xanh nước biển -> z; Màu xanh lá -> y
 
-const helper = new THREE.DirectionalLightHelper( directionalLight, 2000 );
-scene.add( helper );
+// const helper = new THREE.DirectionalLightHelper( directionalLight, 2000 );
+// scene.add( helper );
